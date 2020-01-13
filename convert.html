@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<!--- made by Spoody. Skype: Speed4Fun8 --->
+<!--- Credits to ACE, @benhanks040888 and jsBeatifyer --->
+<!--- feel free to use this on your site, but please give credits if you use any or my code :) --->
+
+<head> 
+    <title>Arma 3 SQF Converter</title>
+    <meta charset="UTF-8"> 
+    <meta name="description" content="SQF Converter. The best Arma 3 SQF tools out there!" />
+    <meta name="keywords" content="hpp to sqf, converter, sqf, beautifyer, rename variables, encrypt, decrypt, obfuscate, crypt, cryptkey, beautify, minify, arma 3, arma 2, spoody" />
+    <meta name="author" content="Spoody" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="http://armatools.fallox.cloud/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="http://armatools.fallox.cloud/css/component.css" />
+    <link rel="stylesheet" type="text/css" href="http://armatools.fallox.cloud/css/editor.css" />
+    <script src="http://armatools.fallox.cloud/js/modernizr.custom.js"></script>
+    <script src="http://armatools.fallox.cloud/js/waves.js"></script>
+    <script src="http://armatools.fallox.cloud/js/beautify.js"></script>
+    <script src="http://armatools.fallox.cloud/js/beautify2.js"></script>
+    <script src="http://armatools.fallox.cloud/js/editor.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="topMenu">
+            <section class="section section--menu" id="Shylock">
+                <nav class="menu menu--shylock">
+                    <ul class="menu__list">
+                        <div id="dl-menu2" class="dl-menuwrapper">
+                            <li class="dl-trigger menu__item menu__item--current"><a class="menu__link">SQF Converter</a></li>
+                            <ul class="dl-menu">
+                                <li data-balloon-length="large" data-balloon="converts GUI Editors Class format to SQF" data-balloon-pos="right">
+                                    <a onclick="GUIEditor()">HPP to SQF Converter</a>
+                                </li>
+                                <li data-balloon-length="large" data-balloon="removes C style comments" data-balloon-pos="right">
+                                    <a onclick="menuComments()">remove Comments</a>
+                                </li>
+                                <li data-balloon-length="large" data-balloon="renames all Local Variables" data-balloon-pos="right">
+                                    <a onclick="menuLocalVariable()">rename Local Variables</a>
+                                </li>
+                                <li data-balloon-length="large" data-balloon="renames all Global Variables" data-balloon-pos="right">
+                                    <a onclick="menuGlobalVariable()">rename Global Variables</a>
+                                </li>
+                                <li data-balloon-length="large" data-balloon="dynamic Global Variable randomizer inspired by Fini" data-balloon-pos="right">
+                                    <a onclick="menuRandomVariable()">dynamic Variable Randomizer</a>
+                                </li>
+                                <li data-balloon-length="large" data-balloon="decrypts encrypted code that was encrypted by Iseco's SQF Encrypter. does not support Edits" data-balloon-pos="right">
+                                    <a onclick="menuCracker()">Iseco's SQF Decrypter</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div id="dl-menu3" class="dl-menuwrapper">
+                            <li class="dl-trigger menu__item"><a class="menu__link">SQF Formatter</a></li>
+                            <ul class="dl-menu">
+                                <li data-balloon-length="large" data-balloon="puts all the code in one line and removes spacing" data-balloon-pos="right">
+                                    <a onclick="menuMinify()">Minifier</a>
+                                </li>
+                                <li data-balloon-length="large" data-balloon="deobfuscate minifyed code by adding line breaks and spacings" data-balloon-pos="right">
+                                    <a onclick="menuBeautify()">Beautifier</a>
+                                </li>
+                                <li data-balloon-length="large" data-balloon="deobfuscate minifyed code including strings by adding line breaks and spacings for string obfuscated code like infistar's AH & AT (may modify strings used in important statements)" data-balloon-pos="right">
+                                    <a onclick="menuBeautifyString()">Strings Beautifier</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </ul>
+                </nav>
+            </section>
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="http://armatools.fallox.cloud/js/jquery.dlmenu.js"></script>
+    <script>
+        $(function() {
+            $('#dl-menu').dlmenu();
+        });
+        $(function() {
+            $('#dl-menu2').dlmenu();
+        });
+        $(function() {
+            $('#dl-menu3').dlmenu();
+        });
+    </script>
+    <!-- /container -->
+    <script src="http://armatools.fallox.cloud/js/classie.js"></script>
+    <script src="http://armatools.fallox.cloud/js/clipboard.min.js"></script>
+    <script>
+        (function() {
+            [].slice.call(document.querySelectorAll('.menu')).forEach(function(menu) {
+                var menuItems = menu.querySelectorAll('.menu__link'),
+                    setCurrent = function(ev) {
+                        ev.preventDefault();
+
+                        var item = ev.target.parentNode; // li
+
+                        // return if already current
+                        if (classie.has(item, 'menu__item--current')) {
+                            return false;
+                        }
+                        // remove current
+                        classie.remove(menu.querySelector('.menu__item--current'), 'menu__item--current');
+                        // set current
+                        classie.add(item, 'menu__item--current');
+                    };
+
+                [].slice.call(menuItems).forEach(function(el) {
+                    el.addEventListener('click', setCurrent);
+                });
+            });
+
+            [].slice.call(document.querySelectorAll('.link-copy')).forEach(function(link) {
+                link.setAttribute('data-clipboard-text', location.protocol + '//' + location.host + location.pathname + '#' + link.parentNode.id);
+                new Clipboard(link);
+                link.addEventListener('click', function() {
+                    classie.add(link, 'link-copy--animate');
+                    setTimeout(function() {
+                        classie.remove(link, 'link-copy--animate');
+                    }, 300);
+                });
+            });
+        })(window);
+    </script>
+    <div id="keyinput">
+        <div id="keyname"></div>
+        <div id="keynametext" data-balloon-length="large" data-balloon="Put your custom cryptkey/text here" data-balloon-pos="right">Key</div>
+        <input id="secretkey" type="text" name="secretkey" onkeyup="inputCode()">
+    </div>
+    <pre id="editor1" class="inputCode" onkeyup="inputCode()">//Input *Note: you can drag and drop files here*</pre>
+    <pre id="editor2" class="outputCode" onkeyup="outputCode()">//Output *Note: you can drag and drop files here*</pre>
+    <div class="footer">
+        <center><span>Created by <a data-balloon="hit me up on skype!" data-balloon-pos="up" href="skype:speed4fun8?chat">Spoody</a><br />
+        Hosted by:<a data-balloon="hit me up on discord Nikko#0297!" data-balloon-pos="up" href="https://discord.gg/Zn3C8EE"> Nikko </a></span></center>
+    </div>
+    <script src="http://armatools.fallox.cloud/src/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script>
+        var catchDroppedFiles = function(editor) {
+            "use strict";
+
+            function catchAndDoNothing(e) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+
+            function drop(e) {
+                catchAndDoNothing(e);
+                var file = e.dataTransfer.files[0];
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        var contents = e.target.result;
+                        editor.session.setValue(contents);
+                        if (editor === editor1) {
+                            inputCode();
+                        } else {
+                            outputCode();
+                        }
+                    };
+                    reader.readAsText(file);
+                } else {
+                    throw new Error("Failed to load file");
+                }
+            }
+
+            function dragAndDropHook() {
+                editor.container.addEventListener("dragenter", catchAndDoNothing, false);
+                editor.container.addEventListener("dragover", catchAndDoNothing, false);
+                editor.container.addEventListener("drop", drop, false);
+            }
+            dragAndDropHook();
+        };
+        var editor1 = ace.edit("editor1");
+        catchDroppedFiles(editor1);
+        editor1.setTheme("ace/theme/tomorrow_night_eighties");
+        editor1.session.setMode("ace/mode/sqf");
+        editor1.session.setUseWrapMode(true);
+        editor1.session.setWrapLimitRange();
+        editor1.setOption("showPrintMargin", false)
+        document.getElementById('editor1').style.opacity = '1';
+        editor1.$blockScrolling = Infinity;
+        var editor2 = ace.edit("editor2");
+        catchDroppedFiles(editor2);
+        editor2.setTheme("ace/theme/tomorrow_night_eighties");
+        editor2.session.setMode("ace/mode/sqf");
+        editor2.session.setUseWrapMode(true);
+        editor2.session.setWrapLimitRange();
+        editor2.setOption("showPrintMargin", false);
+        document.getElementById('editor2').style.opacity = '1';
+        editor2.$blockScrolling = Infinity;
+    </script>
+    <script type="text/javascript">
+        Waves.attach('.topMenu a', 'waves-light');
+        var config = {
+            duration: 1000,
+            delay: 0
+        };
+        Waves.init(config);
+    </script>
+ 
+</body>
+
+</html>

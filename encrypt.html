@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<!--- made by Spoody. Skype: Speed4Fun8 --->
+<!--- Credits to ACE, @benhanks040888 and jsBeatifyer --->
+<!--- feel free to use this on your site, but please give credits if you use any or my code :) --->
+
+<head> 
+    <title>Arma 3 SQF Encrypter</title>
+    <meta charset="UTF-8"> 
+    <meta name="description" content="SQF Encrypter. The best Arma 3 SQF tools out there!" />
+    <meta name="keywords" content="sqf, encrypt, decrypt, obfuscate, crypt, cryptkey, beautify, minify, arma 3, arma 2, spoody" />
+    <meta name="author" content="Spoody" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="http://armatools.fallox.cloud/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="http://armatools.fallox.cloud/css/component.css" />
+    <link rel="stylesheet" type="text/css" href="http://armatools.fallox.cloud/css/editor.css" />
+    <script src="http://armatools.fallox.cloud/js/modernizr.custom.js"></script>
+    <script src="http://armatools.fallox.cloud/js/waves.js"></script>
+    <script src="http://armatools.fallox.cloud/js/beautify.js"></script>
+    <script src="http://armatools.fallox.cloud/js/beautify2.js"></script>
+    <script src="http://armatools.fallox.cloud/js/editor.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="topMenu">
+            <section class="section section--menu" id="Shylock">
+                <nav class="menu menu--shylock">
+                    <ul class="menu__list">
+                        <div id="dl-menu" class="dl-menuwrapper">
+                            <li class="dl-trigger menu__item menu__item--current"><a class="menu__link">SQF Crypt Methode</a></li>
+                            <ul class="dl-menu">
+                                <li data-balloon-length="large" data-balloon="converts the code into a splitstring.&#13;&#10;Decryption time for 100 letters: 0.072ms" data-balloon-pos="right">
+                                    <a onclick="menuSplitString()">Split String</a>
+                                </li>
+                                <li data-balloon-length="large" data-balloon="reverses the code into a string&#13;&#10;Decryption time for 100 letters: 0.012ms" data-balloon-pos="right">
+                                    <a onclick="menuReverseString()">Reverse String</a>
+                                </li>
+                                <li data-balloon-length="large" data-balloon="converts the code into unicode numbers&#13;&#10;Decryption time for 100 letters: 0.019ms" data-balloon-pos="right">
+                                    <a onclick="menuCrypt()">Unicode</a>
+                                </li>
+                                <li data-balloon-length="large" data-balloon="The Caesar Cipher is an encryption named after Julius Caesar, who used it to protect messages of military significance.&#13;&#10;Decryption time for 100 letters: 0.56ms" data-balloon-pos="right">
+                                    <a onclick="menuCaesarCipherString()">Caesar Cipher</a>
+                                </li>
+                                <li data-balloon-length="large" data-balloon="converts the code into unicode numbers and obfuscates it using squareroot&#13;&#10;Decryption time for 100 letters: 0.19ms" data-balloon-pos="right">
+                                    <a onclick="menuCryptkey()">SquareRoot</a>
+                                </li>
+                                <li data-balloon-length="large" data-balloon="converts the code into unicode numbers, obfuscates it using squareroot and converts it back to a string&#13;&#10;Decryption time for 100 letters: 0.19ms" data-balloon-pos="right">
+                                    <a onclick="menuCryptkeytoString()">SquareRoot String</a>
+                                </li>
+                                <li data-balloon-length="large" data-balloon="famous Iseco's SQF encryption used most by Hackers to obfuscate their code as seen in JME's or Lystic's Menus&#13;&#10;Decryption time for 100 letters: 0.70ms" data-balloon-pos="right">
+                                    <a onclick="menuIseco()">Iseco's Custom Key Crypter</a>
+                                </li>
+                                <li data-balloon-length="large" data-balloon="famous Iseco's SQF encryption edit by Molaron&#13;&#10;Decryption time for 100 letters: 0.70ms" data-balloon-pos="right">
+                                    <a onclick="menuMolaron()">Iseco's Crypter Molaron's Edit</a>
+                                </li>
+                                <li data-balloon-length="large" data-balloon="my edit of Iseco's encryption&#13;&#10;Decryption time for 100 letters: 1.15ms" data-balloon-pos="right">
+                                    <a onclick="menuSpoody()">Iseco's Crypter Spoody's Edit</a>
+                                </li>
+                                <li data-balloon-length="large" data-balloon="famous Iseco's SQF encryption used most by Hackers to obfuscate their code as seen in JME's or Lystic's Menus&#13;&#10;Decryption time for 100 letters: 0.70ms" data-balloon-pos="right">
+                                    <a onclick="menuIsecoGUID()">Iseco's PlayerID Crypter</a>
+                                </li>
+                                <li data-balloon-length="large" data-balloon="my edit of Iseco's encryption with playerID cryptkey&#13;&#10;Decryption time for 100 letters: 1.15ms" data-balloon-pos="right">
+                                    <a onclick="menuSpoodyGUID()">Spoody's PlayerID Crypter</a>
+                                </li>
+                                <li data-balloon-length="large" data-balloon="Multiline encryption WIP" data-balloon-pos="right">
+                                    <a onclick="menuPoseidon()">New Poseidon</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div id="dl-menu2" class="dl-menuwrapper">
+                            <li class="dl-trigger menu__item"><a class="menu__link">SQF Server Crypt Methode</a></li>
+                            <ul class="dl-menu">
+                                <li data-balloon-length="large" data-balloon="converts the code into unicode numbers and obfuscates it using squareroot" data-balloon-pos="right">
+                                    <a onclick="menuSSCryptkey()">SquareRoot</a>
+                                </li>
+                                <li data-balloon-length="large" data-balloon="converts the code into unicode numbers, obfuscates it using squareroot and randomizes the numbers by adding random values" data-balloon-pos="right">
+                                    <a onclick="menuSSCryptkeyRandom()">SquareRoot Random Key</a>
+                                </li>
+                                <li data-balloon-length="large" data-balloon="converts the code into unicode numbers, obfuscates it using squareroot and converts it back to a string" data-balloon-pos="right">
+                                    <a onclick="menuSSCryptkeytoString()">SquareRoot String</a>
+                                </li>
+                                <li data-balloon-length="large" data-balloon="converts the code into unicode numbers, obfuscates it using squareroot and converts it back to a splitstring" data-balloon-pos="right">
+                                    <a onclick="menuSSCryptkeytoStringSplit()">SquareRoot String Split</a>
+                                </li>
+                                <li data-balloon-length="large" data-balloon="converts the code into unicode numbers, obfuscates it using squareroot, randomizes the letters by adding random values and converts it back to a string" data-balloon-pos="right">
+                                    <a onclick="menuSSCryptkeytoStringRandom()">SquareRoot String Random Key</a>
+                                </li>
+                                <li data-balloon-length="large" data-balloon="converts the code into unicode numbers, obfuscates it using squareroot, randomizes the letters by adding random values and converts it back to a splitstring" data-balloon-pos="right">
+                                    <a onclick="menuSSCryptkeytoStringSplitRandom()">SquareRoot String Split Random Key</a>
+                                </li>
+                                <li data-balloon-length="large" data-balloon="squareRoot string cryptkey methode with costom cryptkey that is hidden serversided to make decryption for attackers as hard as it can possible be" data-balloon-pos="right">
+                                    <a onclick="menuSSCryptkeytoStringCustom()">SquareRoot String Custom Secret Key</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </ul>
+                </nav>
+            </section>
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="http://armatools.fallox.cloud/js/jquery.dlmenu.js"></script>
+    <script>
+        $(function() {
+            $('#dl-menu').dlmenu();
+        });
+        $(function() {
+            $('#dl-menu2').dlmenu();
+        });
+        $(function() {
+            $('#dl-menu3').dlmenu();
+        });
+    </script>
+    <!-- /container -->
+    <script src="http://armatools.fallox.cloud/js/classie.js"></script>
+    <script src="http://armatools.fallox.cloud/js/clipboard.min.js"></script>
+    <script>
+        (function() {
+            [].slice.call(document.querySelectorAll('.menu')).forEach(function(menu) {
+                var menuItems = menu.querySelectorAll('.menu__link'),
+                    setCurrent = function(ev) {
+                        ev.preventDefault();
+
+                        var item = ev.target.parentNode; // li
+
+                        // return if already current
+                        if (classie.has(item, 'menu__item--current')) {
+                            return false;
+                        }
+                        // remove current
+                        classie.remove(menu.querySelector('.menu__item--current'), 'menu__item--current');
+                        // set current
+                        classie.add(item, 'menu__item--current');
+                    };
+
+                [].slice.call(menuItems).forEach(function(el) {
+                    el.addEventListener('click', setCurrent);
+                });
+            });
+
+            [].slice.call(document.querySelectorAll('.link-copy')).forEach(function(link) {
+                link.setAttribute('data-clipboard-text', location.protocol + '//' + location.host + location.pathname + '#' + link.parentNode.id);
+                new Clipboard(link);
+                link.addEventListener('click', function() {
+                    classie.add(link, 'link-copy--animate');
+                    setTimeout(function() {
+                        classie.remove(link, 'link-copy--animate');
+                    }, 300);
+                });
+            });
+        })(window);
+    </script>
+    <div id="keyinput">
+        <div id="keyname"></div>
+        <div id="keynametext" data-balloon-length="large" data-balloon="Put your custom cryptkey/text here" data-balloon-pos="right">Key</div>
+        <input id="secretkey" type="text" name="secretkey" onkeyup="inputCode()">
+    </div>
+    <pre id="editor1" class="inputCode" onkeyup="inputCode()">//Input *Note: you can drag and drop files here*</pre>
+    <pre id="editor2" class="outputCode" onkeyup="outputCode()">//Output *Note: you can drag and drop files here*</pre>
+    <div class="footer">
+        <center><span>Created by <a data-balloon="hit me up on skype!" data-balloon-pos="up" href="skype:speed4fun8?chat">Spoody</a><br />
+            Hosted by:<a data-balloon="hit me up on discord Nikko#0297!" data-balloon-pos="up" href="https://discord.gg/Zn3C8EE"> Nikko </a></span></center>
+    </div>
+    <script src="http://armatools.fallox.cloud/src/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script>
+        var catchDroppedFiles = function(editor) {
+            "use strict";
+
+            function catchAndDoNothing(e) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+
+            function drop(e) {
+                catchAndDoNothing(e);
+                var file = e.dataTransfer.files[0];
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        var contents = e.target.result;
+                        editor.session.setValue(contents);
+                        if (editor === editor1) {
+                            inputCode();
+                        } else {
+                            outputCode();
+                        }
+                    };
+                    reader.readAsText(file);
+                } else {
+                    throw new Error("Failed to load file");
+                }
+            }
+
+            function dragAndDropHook() {
+                editor.container.addEventListener("dragenter", catchAndDoNothing, false);
+                editor.container.addEventListener("dragover", catchAndDoNothing, false);
+                editor.container.addEventListener("drop", drop, false);
+            }
+            dragAndDropHook();
+        };
+        var editor1 = ace.edit("editor1");
+        catchDroppedFiles(editor1);
+        editor1.setTheme("ace/theme/tomorrow_night_eighties");
+        editor1.session.setMode("ace/mode/sqf");
+        editor1.session.setUseWrapMode(true);
+        editor1.session.setWrapLimitRange();
+        editor1.setOption("showPrintMargin", false)
+        document.getElementById('editor1').style.opacity = '1';
+        editor1.$blockScrolling = Infinity;
+        var editor2 = ace.edit("editor2");
+        catchDroppedFiles(editor2);
+        editor2.setTheme("ace/theme/tomorrow_night_eighties");
+        editor2.session.setMode("ace/mode/sqf");
+        editor2.session.setUseWrapMode(true);
+        editor2.session.setWrapLimitRange();
+        editor2.setOption("showPrintMargin", false);
+        document.getElementById('editor2').style.opacity = '1';
+        editor2.$blockScrolling = Infinity;
+    </script>
+    <script type="text/javascript">
+        Waves.attach('.topMenu a', 'waves-light');
+        var config = {
+            duration: 1000,
+            delay: 0
+        };
+        Waves.init(config);
+    </script>
+ 
+</body>
+
+</html>

@@ -1,0 +1,15 @@
+body{overflow:hidden;background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAIklEQVQIW2NkwAT1jGhi9UB+I7IgWACkCCYIF4AJogiABAHNvwSF8tfFKQAAAABJRU5ErkJggg==);background-color:#4C4C4C;}
+#keyinput{transition:.3s;opacity:0;}
+#keyname{position:absolute;top:60px;height:27px;width:calc(100% - 42px);left:42px;text-align:left;display:none;pointer-events:none;border-bottom:solid 1px #d94f5c;z-index:500;}
+#keynametext{background:#272727;position:absolute;top:60px;left:0;height:27px;width:42px;padding-top:5px;padding-left:9px;color:#CCCCCC;font-family:Monaco, Menlo, 'Ubuntu Mono', Consolas, source-code-pro, monospace;font-size:15px;align-content:center;cursor:pointer;z-index:5000;}
+#secretkey{position:absolute;top:60px;height:25px;width:calc(100% - 42px);left:42px;color:white;padding-left:3px;color:#999999;font-family:Monaco, Menlo, 'Ubuntu Mono', Consolas, source-code-pro, monospace;background-color:rgba(45, 45, 45, 0.50);outline:none;-webkit-appearance:none;appearance:none;box-shadow:none;border-radius:none;border:none;display:none;}
+#editor1{top:50px;bottom:30px;left:0;width:50vw;position:absolute;font-size:13px;opacity:0;transition:top .3s;border-right:solid 1px #B1AEA6;}
+#editor2{top:50px;bottom:30px;right:0;width:50vw;position:absolute;font-size:13px;opacity:0;transition:top .3s;}
+#loading{opacity:1;margin:0;position:absolute;height:100%;width:100%;top:0;transition:.3s;transition-delay:.3s;pointer-events:none;}
+#loading img{border-radius:100%;border:solid #d94f5c 2px;position:absolute;top:50%;left:50%;transform:translateX(-50%) translateY(-50%);height:100px;width:100px;}
+.footer{background:rgba(35, 35, 35, 0.7);height:45px;bottom:0;width:100vw;position:absolute;border-top:solid 1px #d94f5c;z-index:10000;}
+.footer span{font-size:12px;}
+a{transition:.3s;}
+.menu{top:0;position:absolute;background:rgba(35, 35, 35, 0.7);font-size:1vw;width:100%;border-bottom:solid 1px;}
+.menu__list{cursor:pointer !important;}
+.dl-menu{z-index:15000;}
