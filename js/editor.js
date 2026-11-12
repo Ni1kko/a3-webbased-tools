@@ -36,14 +36,14 @@ var inputCode = function() {
         case "MolaronCryptkey":
             MolaronCryptkey();
             break;
-        case "IsecoCryptkeySpoody":
-            IsecoCryptkeySpoody();
+        case "IsecoCryptkeyV2":
+            IsecoCryptkeyV2();
             break;
         case "IsecoCryptkeyGUID":
             IsecoCryptkeyGUID();
             break;
-        case "SpoodyCryptkeyGUID":
-            SpoodyCryptkeyGUID();
+        case "V2CryptkeyGUID":
+            V2CryptkeyGUID();
             break;
         case "Poseidon":
             CodePoseidon();
@@ -196,11 +196,11 @@ var menuMolaron = function() {
     inputCase = "MolaronCryptkey";
     outputCase = "noneCode";
 };
-var menuSpoody = function() {
+var menuV2 = function() {
     document.getElementById('secretkey').value = '//put a custom cryptkey here';
-    IsecoCryptkeySpoody();
+    IsecoCryptkeyV2();
     getkeyinputfield();
-    inputCase = "IsecoCryptkeySpoody";
+    inputCase = "IsecoCryptkeyV2";
     outputCase = "noneCode";
 };
 var menuIsecoGUID = function() {
@@ -210,11 +210,11 @@ var menuIsecoGUID = function() {
     inputCase = "IsecoCryptkeyGUID";
     outputCase = "noneCode";
 };
-var menuSpoodyGUID = function() {
+var menuV2GUID = function() {
     document.getElementById('secretkey').value = '//put a PlayerID here';
-    SpoodyCryptkeyGUID();
+    V2CryptkeyGUID();
     getkeyinputfield();
-    inputCase = "SpoodyCryptkeyGUID";
+    inputCase = "V2CryptkeyGUID";
     outputCase = "noneCode";
 };
 var menuPoseidon = function() {
@@ -441,7 +441,7 @@ function getInputValue() {
             }
         };
         xhttp.open("GET", "http://www.armatools.fallox.cloud/SQFBin/api/create", true);
-        var startrequest = "name=Spoody-Converter&private=0&title=Converter-Save&lang=text&text=/*www.armatools.fallox.cloud*/";
+        var startrequest = "name=V2-Converter&private=0&title=Converter-Save&lang=text&text=/*www.armatools.fallox.cloud*/";
         console.log(startrequest);
         xhttp.send(startrequest + codeInput);
         console.log(xhttp.responseText)
@@ -981,7 +981,7 @@ var IsecoCryptkey = function() {
     codeOutput = codeOutput.replace(",]", "]");
     editor2.setValue(codeOutput, 1);
 };
-var IsecoCryptkeySpoody = function() {
+var IsecoCryptkeyV2 = function() {
     var codeInput = editor1.getValue();
     var codekeyinput = document.getElementById('secretkey').value;
     codekeyinput = codekeyinput.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, "");
@@ -1061,7 +1061,7 @@ var IsecoCryptkeyGUID = function() {
         editor2.setValue("//ERROR: please put a valid PlayerID in the textinput above! example: 76561192432151512", 1);
     };
 };
-var SpoodyCryptkeyGUID = function() {
+var V2CryptkeyGUID = function() {
     var codeInput = editor1.getValue();
     var codekeyinput = document.getElementById('secretkey').value;
     codekeyinput = codekeyinput.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, "");
